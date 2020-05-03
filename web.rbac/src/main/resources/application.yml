@@ -1,0 +1,48 @@
+server:
+    port: 3017
+    servlet:
+        session:
+            timeout: PT1440M
+
+spring:
+    thymeleaf:
+        cache: false
+    application:
+        name: web-rbac
+
+redis:
+    host: 127.0.0.1
+    port: 6379
+    password: 123123
+    database: 2
+    timeout: 1000
+    maxIdle: 200
+    minIdle: 0
+    maxActive: 200
+    maxWait: 1000
+    maxTotal: 1000
+    cacheExpire: 600
+
+database:
+    names: master
+    master:
+        url: jdbc:mysql://127.0.0.1
+        username: root
+        password: 535002030102
+        pool-name: master
+
+management:
+    endpoint:
+        web:
+            exposure:
+                include: 'bus-refresh'
+
+eureka:
+    instance:
+        appname: 权限系统
+        hostname: www.oa.com
+    client:
+        registerWithEureka: true
+        fetchRegistry: true
+        service-url:
+            defaultZone: http://admin:123456@127.0.0.1:3701/eureka/

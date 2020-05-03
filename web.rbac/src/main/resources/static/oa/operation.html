@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8"/>
+    <title>查询操作日志</title>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+</head>
+<body>
+<div id="app">
+    <!-- 导航栏 -->
+    <div class="navigator">
+        <el-breadcrumb class="pager" separator-class="el-icon-arrow-right">
+            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>系统管理</el-breadcrumb-item>
+            <el-breadcrumb-item>查询操作日志</el-breadcrumb-item>
+        </el-breadcrumb>
+        <!-- 搜索功能 -->
+        <el-date-picker :clearable="false" :picker-options="pickerOptions" align="right" end-placeholder="结束日期"
+                        range-separator="至" size="small"
+                        start-placeholder="开始日期" type="datetimerange" v-model="datetime"
+                        value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+        <el-input class="input-with-select" placeholder="请输入内容" size="small" v-model="searchText">
+            <el-select slot="prepend" v-model="timespan">
+                <el-option label="用时" value="0"></el-option>
+                <el-option label="1秒" value="1000"></el-option>
+                <el-option label="3秒" value="3000"></el-option>
+                <el-option label="5秒" value="5000"></el-option>
+                <el-option label="8秒" value="8000"></el-option>
+                <el-option label="10秒" value="10000"></el-option>
+            </el-select>
+            <el-button @click="btnSearchClick" icon="el-icon-search" slot="append"></el-button>
+        </el-input>
+        <div class="fr">
+            <el-button @click="search" icon="el-icon-refresh" size="small"></el-button>
+        </div>
+    </div>
+    <!-- 表格 -->
+    <el-table :border="true" :data="tableData" element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中"
+              size="mini" v-loading="loading">
+        <el-table-column label="时间" prop="timestamp" width="180px"></el-table-column>
+        <el-table-column label="项目" prop="project" width="120px"></el-table-column>
+        <el-table-column label="用时" prop="timespan" width="100px"></el-table-column>
+        <el-table-column label="帐号" prop="username" width="150px"></el-table-column>
+        <el-table-column label="IP" prop="ip" width="140px"></el-table-column>
+        <el-table-column label="网址" prop="url" width="150px"></el-table-column>
+        <el-table-column label="SESSION" prop="session" width="280px"></el-table-column>
+        <el-table-column label="参数" prop="parameter"></el-table-column>
+        <el-table-column label="结果" prop="result"></el-table-column>
+    </el-table>
+    <el-pagination :current-page="page" :page-size="15" :total="rowCount" @current-change="pageChanged" class="pager"
+                   layout="total, prev, pager, next" slot="paging"></el-pagination>
+</div>
+<link href="/js/vue/element/element-ui.css" rel="stylesheet"/>
+<link href="/css/core.css" rel="stylesheet"/>
+<script src="/js/vue/element/vue.js"></script>
+<script src="/js/vue/element/axios.js"></script>
+<script src="/js/vue/element/element-ui.js"></script>
+<script src="/js/util/core.js"></script>
+<script src="/js/oa/operation.js"></script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8"/>
+    <title>员工帐号管理</title>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+</head>
+<body>
+<div id="app">
+    <!-- 导航栏 -->
+    <div class="navigator">
+        <el-breadcrumb class="pager" separator-class="el-icon-arrow-right">
+            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>员工帐号管理</el-breadcrumb-item>
+        </el-breadcrumb>
+        <!-- 搜索功能 -->
+        <el-select size="small" v-model="status">
+            <el-option label="帐号状态" value="-1"></el-option>
+            <el-option :key="item.value" :label="item.name" :value="item.value"
+                       v-for="item in enums.status"></el-option>
+        </el-select>
+        <el-input class="input-with-select" placeholder="请输入内容" size="small" v-model="searchText">
+            <el-select slot="prepend" v-model="searchType">
+                <el-option label="搜索类型" value="-1"></el-option>
+                <el-option label="帐号ID" value="1"></el-option>
+                <el-option label="帐号名" value="2"></el-option>
+                <el-option label="帐号昵称" value="3"></el-option>
+            </el-select>
+            <el-button @click="btnSearchClick" icon="el-icon-search" slot="append"></el-button>
+        </el-input>
+        <div class="fr">
+            <el-button @click="showInsertDialog" icon="el-icon-plus" size="small" v-if="editQualify"></el-button>
+            <el-button @click="search" icon="el-icon-refresh" size="small"></el-button>
+        </div>
+    </div>
+    <!-- 表格 -->
+    <el-table :border="true" :data="tableData" element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中"
+              size="mini" v-loading="loading">
+        <el-table-column label="帐号ID" prop="id"></el-table-column>
+        <el-table-column label="帐号名称" prop="name"></el-table-column>
+        <el-table-column label="昵称" prop="alias">
+            <template slot-scope="scope">
+                <img :src="scope.row.avatar" style="float: left; margin-right: 5px; max-width: 30px; max-height: 30px"/>
+                <label>{{scope.row.alias}}</label>
+            </template>
+        </el-table-column>
+        <el-table-column label="类型" prop="type">
+            <template slot-scope="scope">{{ enums.staffType.getName(scope.row.type) }}</template>
+        </el-table-column>
+        <el-table-column label="平台" prop="platform">
+            <template slot-scope="scope">{{ enums.platform.getName(scope.row.platform) }}</template>
+        </el-table-column>
+        <el-table-column label="状态" prop="status">
+            <template slot-scope="scope">
+                <label :class="scope.row.status == enums.status.ENABLE.value ? '' : 'red'">{{
+                    enums.status.getName(scope.row.status) }}</label>
+            </template>
+        </el-table-column>
+        <el-table-column label="操作" v-if="editQualify || permissionQualify">
+            <template slot-scope="scope">
+                <el-button-group>
+                    <el-button @click="toEdit(scope.row)" icon="el-icon-edit" size="mini"
+                               v-if="editQualify"></el-button>
+                    <el-button @click="toPermission(scope.row)" icon="el-icon-set-up" size="mini"
+                               v-if="permissionQualify"></el-button>
+                </el-button-group>
+            </template>
+        </el-table-column>
+    </el-table>
+    <el-pagination :current-page="page" :page-size="15" :total="rowCount" @current-change="pageChanged" class="pager"
+                   layout="total, prev, pager, next" slot="paging"></el-pagination>
+    <!-- 添加删除帐号 -->
+    <el-dialog :title="dialogTitle" :visible.sync="dialogEnabled" width="480px">
+        <el-form :model="staff" label-width="80px" ref="staff">
+            <el-form-item :rules="[{ required: true, message: '请填写帐号名称', trigger: 'blur' }]" label="帐号名称" prop="name">
+                <el-input :disabled="username_disabled" v-model="staff.name"></el-input>
+            </el-form-item>
+            <el-form-item label="帐号密码" prop="password">
+                <el-input show-password v-model="staff.password"></el-input>
+            </el-form-item>
+            <el-form-item :rules="[{ required: true, message: '请填写帐号昵称', trigger: 'blur' }]" label="帐号昵称" prop="alias">
+                <el-input v-model="staff.alias"></el-input>
+            </el-form-item>
+            <el-form-item label="帐号头像" prop="alias">
+                <el-upload :before-upload="beforeUpload" :show-file-list="false" action="" class="avatar-uploader">
+                    <img :src="staff.avatar" style="max-width: 100px; max-height: 100px" v-if="staff.avatar">
+                    <i class="el-icon-plus avatar-uploader-icon" v-else></i>
+                </el-upload>
+            </el-form-item>
+            <el-form-item :rules="[{ required: true, message: '请选择帐号类型', trigger: 'change' }]" label="帐号类型" prop="type">
+                <el-select placeholder="请选择帐号类型" v-model="staff.type">
+                    <el-option :key="item.value" :label="item.name" :value="item.value"
+                               v-for="item in enums.staffType"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item :rules="[{ required: true, message: '请选择平台', trigger: 'change' }]" label="平台" prop="platform">
+                <el-select placeholder="请选择平台" v-model="staff.platform">
+                    <el-option :key="item.value" :label="item.name" :value="item.value"
+                               v-for="item in enums.platform"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item :rules="[{ required: true, message: '请选择状态', trigger: 'change' }]" label="状态" prop="status">
+                <el-radio-group v-model="staff.status">
+                    <el-radio-button :key="item.value" :label="item.value" v-for="item in enums.status">{{item.name}}
+                    </el-radio-button>
+                </el-radio-group>
+            </el-form-item>
+        </el-form>
+        <span class="dialog-footer" slot="footer">
+            <el-button @click="onCancel('staff')">取 消</el-button>
+            <el-button @click="onSubmit('staff')" type="primary">确 定</el-button>
+        </span>
+    </el-dialog>
+</div>
+<!-- 设置权限 -->
+<div id="permission">
+    <el-dialog :title="dialogTitle" :visible.sync="dialogEnabled" width="480px">
+        <el-tree :data="data" default-expand-all highlight-current node-key="id" ref="treeviewer"
+                 show-checkbox></el-tree>
+        <span class="dialog-footer" slot="footer">
+            <el-button @click="dialogEnabled=false">取 消</el-button>
+            <el-button @click="onSubmit('staff')" type="primary">确 定</el-button>
+        </span>
+    </el-dialog>
+</div>
+<link href="/js/vue/element/element-ui.css" rel="stylesheet"/>
+<link href="/css/core.css" rel="stylesheet"/>
+<script src="/js/vue/element/vue.js"></script>
+<script src="/js/vue/element/axios.js"></script>
+<script src="/js/vue/element/element-ui.js"></script>
+<script src="/js/util/core.js"></script>
+<script src="/js/util/md5.js"></script>
+<script src="/js/oa/staff.js"></script>
+</body>
+</html>

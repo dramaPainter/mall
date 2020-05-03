@@ -1,0 +1,38 @@
+@charset "UTF-8";
+body {
+    font-family: system-ui, arial
+}
+
+.red {
+    color: red
+}
+
+.green {
+    color: green
+}
+
+.fl {
+    float: left
+}
+
+.fr {
+    float: right
+}
+
+.pager {
+    margin: 16px 16px 16px 0;
+    text-align: center
+}
+
+.el-select .el-input {
+    width: 130px;
+}
+
+.input-with-select .el-input-group__prepend {
+    background-color: #FFFFFF;
+}
+
+div.input-with-select {
+    width: 500px;
+    margin-bottom: 15px;
+}
