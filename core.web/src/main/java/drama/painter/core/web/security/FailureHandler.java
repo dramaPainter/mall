@@ -23,7 +23,9 @@ class FailureHandler extends SimpleUrlAuthenticationFailureHandler {
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException {
         PasswordAuth.destroy();
         String param = LOGIN_URL.concat("?error=").concat(Strings.urlencode(e.getMessage()));
-        AccessLog.add(project, 0, request, "NULL", Result.toFail("登录失败：" + e.getMessage(), request.getParameterMap()));
+        String know = String.format("username: %s, password: %s", request.getParameter(LoginSecurityConfig.USER_PARAMETER),
+                logger.isDebugEnabled() ? request.getParameter(LoginSecurityConfig.PASSWORD_PARAMETER) : "******");
+        AccessLog.add(project, 0, request, new Object[]{"NULL"}, Result.toFail("登录失败：" + e.getMessage(), know));
         response.sendRedirect(param);
     }
 }

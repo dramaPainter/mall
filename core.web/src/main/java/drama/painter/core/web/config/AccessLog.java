@@ -1,5 +1,6 @@
 package drama.painter.core.web.config;
 
+import drama.painter.core.web.misc.User;
 import drama.painter.core.web.utility.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -42,21 +43,23 @@ public class AccessLog {
     /**
      * 记录格式：{时间} - {项目} {页面加载时间} {登录帐号} {SESSION} {IP} - {页面网址} - {页面参数} - {执行结果}
      * 执行结果：打印由POST方法提交后返回的值(GET方法不打印)
-     *
-     * @param project  项目
-     * @param timespan 页面加载时间
-     * @param request  HttpServletRequest对象
-     * @param post     页面POST值
-     * @param result   执行结果
      */
-    public static void add(String project, long timespan, HttpServletRequest request, String post, Object result) {
+    public static void add(String project, long timespan, HttpServletRequest request, Object[] args, Object result) {
         String url = request.getRequestURI();
         String returnValue = "NULL";
         String parameter;
 
-        if ("POST".equals(request.getMethod())) {
+        if ("/login/qualify".equals(url)) {
+            return;
+        } else if ("POST".equals(request.getMethod())) {
+            if (args.length > 0 && !log.isDebugEnabled() && args[0] instanceof User) {
+                User user = (User) args[0];
+                user.setSalt(null);
+                user.setPassword("******");
+            }
+
             returnValue = Json.toJsonString(result);
-            parameter = post;
+            parameter = StringUtils.arrayToCommaDelimitedString(args);
             parameter = parameter.startsWith("data:image/jpeg;base64,") ? "Upload(上传Base64图片)" : parameter;
         } else {
             parameter = request.getParameterMap().entrySet().stream()
@@ -76,6 +79,7 @@ public class AccessLog {
 
     @Pointcut("@annotation(org.springframework.web.bind.annotation.GetMapping) || @annotation(org.springframework.web.bind.annotation.PostMapping)")
     void cut() {
+        log.info("CUT #####");
     }
 
     @Before("cut()")
@@ -89,7 +93,6 @@ public class AccessLog {
         TIME.remove();
 
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String post = "POST".equals(request.getMethod()) ? StringUtils.arrayToCommaDelimitedString(point.getArgs()) : "";
-        add(project, timespan, request, post, result);
+        add(project, timespan, request, point.getArgs(), result);
     }
 }

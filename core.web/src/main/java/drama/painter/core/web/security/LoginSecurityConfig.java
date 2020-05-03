@@ -25,6 +25,9 @@ import java.util.stream.Collectors;
  */
 public class LoginSecurityConfig extends WebSecurityConfigurerAdapter {
     public static final String AUTHORIZED_URL_PATH = "/login/";
+    public static final String USER_PARAMETER = "loginUser";
+    public static final String PASSWORD_PARAMETER = "loginPassword";
+
     public static final String[] AUTHORIZED_SUFFIX = {"/",
             "*.ico", "*.jpg", "*.jpeg", "*.png", "*.gif",
             "*.html", "*.htm", "*.xml", "*.js", "*.json",
@@ -34,14 +37,17 @@ public class LoginSecurityConfig extends WebSecurityConfigurerAdapter {
             "*.mp3", "*.mp4", "*.mov", "*.ogg", "*.m3u",
             "*.log", "*.txt"
     };
+
     public static final List<String> AUTHORIZED_SUFFIX_ITEM = Arrays.stream(AUTHORIZED_SUFFIX)
             .filter(o -> !"/".equals(o))
             .map(o -> o.replace("*", ""))
             .collect(Collectors.toList());
+
     static final PasswordAuth PASSWORD_AUTH = new PasswordAuth();
     static final String LOGIN_URL = "/login/login";
     static final String SECRET_KEY = "Web-Security-Client-Key";
     protected Function<String, User> userProvider;
+
     @Value("${spring.application.name}")
     String project;
 
@@ -65,7 +71,8 @@ public class LoginSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().rememberMe().rememberMeServices(getRememberMeServices())
                 .and().logout().logoutUrl("/login/logout").logoutSuccessUrl("/")
                 .invalidateHttpSession(true).clearAuthentication(true)
-                .and().formLogin().loginProcessingUrl("/login/security").loginPage(LOGIN_URL).defaultSuccessUrl("/")
+                .and().formLogin().usernameParameter(USER_PARAMETER).passwordParameter(PASSWORD_PARAMETER)
+                .loginProcessingUrl("/login/security").loginPage(LOGIN_URL).defaultSuccessUrl("/")
                 .successHandler(new SuccessHandler(project)).failureHandler(new FailureHandler(project))
                 .permitAll();
     }

@@ -6,19 +6,18 @@
     <link href="/js/vue/element/element-ui.css" rel="stylesheet"/>
 </head>
 <body>
-<!--suppress HtmlUnknownTarget -->
 <form action="/login/security" class="el-form demo-ruleForm" method="post" onsubmit="return false">
     <div class="el-form-item"><label class="el-form-item__label" style="width: 100px">用户名</label>
         <div class="el-form-item__content" style="margin-left: 100px">
             <div class="el-input">
-                <label><input class="el-input__inner" name="username" style="width: 200px" type="text"/></label>
+                <label><input class="el-input__inner" name="loginUser" style="width: 200px" type="text"/></label>
             </div>
         </div>
     </div>
     <div class="el-form-item"><label class="el-form-item__label" style="width: 100px">密码</label>
         <div class="el-form-item__content" style="margin-left: 100px">
             <div class="el-input">
-                <label><input class="el-input__inner" id="password" name="password" style="width: 200px"
+                <label><input class="el-input__inner" id="password" name="loginPassword" style="width: 200px"
                               type="password"/></label>
             </div>
         </div>
@@ -43,7 +42,7 @@
 <script src="/js/util/md5.js"></script>
 <script>
     function onSubmit() {
-        var pwd = document.getElementById("password");
+        let pwd = document.getElementById("password");
         pwd.value = MD5(pwd.value);
         document.forms[0].submit();
     }

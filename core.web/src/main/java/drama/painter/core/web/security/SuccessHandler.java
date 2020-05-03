@@ -21,6 +21,6 @@ class SuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
         PasswordAuth.destroy();
         super.onAuthenticationSuccess(request, response, authentication);
-        AccessLog.add(project, 0, request, authentication.getName(), Result.toSuccess("登录成功"));
+        AccessLog.add(project, 0, request, new Object[]{authentication.getName()}, Result.toSuccess("登录成功"));
     }
 }
