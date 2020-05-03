@@ -3,6 +3,7 @@ package drama.painter.core.web.misc;
 import drama.painter.core.web.enums.PlatformEnum;
 import drama.painter.core.web.enums.StaffTypeEnum;
 import drama.painter.core.web.enums.StatusEnum;
+import jdk.nashorn.internal.objects.annotations.Setter;
 import lombok.Data;
 import lombok.Getter;
 import org.springframework.util.StringUtils;
@@ -31,6 +32,7 @@ public class User {
     @Getter
     List<String> permission;
 
+    @Setter
     public void setPermission(String permission) {
         if (StringUtils.isEmpty(permission)) {
             this.permission = Collections.EMPTY_LIST;
