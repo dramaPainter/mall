@@ -40,7 +40,7 @@
         <el-table-column label="帐号名称" prop="name"></el-table-column>
         <el-table-column label="昵称" prop="alias">
             <template slot-scope="scope">
-                <img :src="scope.row.avatar" style="float: left; margin-right: 5px; max-width: 30px; max-height: 30px"/>
+                <img alt="" :src="scope.row.avatar" style="float: left; margin-right: 5px; max-width: 30px; max-height: 30px"/>
                 <label>{{scope.row.alias}}</label>
             </template>
         </el-table-column>
@@ -83,7 +83,7 @@
             </el-form-item>
             <el-form-item label="帐号头像" prop="alias">
                 <el-upload :before-upload="beforeUpload" :show-file-list="false" action="" class="avatar-uploader">
-                    <img :src="staff.avatar" style="max-width: 100px; max-height: 100px" v-if="staff.avatar">
+                    <img alt="" :src="staff.avatar" style="max-width: 100px; max-height: 100px" v-if="staff.avatar">
                     <i class="el-icon-plus avatar-uploader-icon" v-else></i>
                 </el-upload>
             </el-form-item>

@@ -13,7 +13,7 @@ import java.io.IOException;
 import static drama.painter.core.web.security.LoginSecurityConfig.LOGIN_URL;
 
 class FailureHandler extends SimpleUrlAuthenticationFailureHandler {
-    String project;
+    final String project;
 
     public FailureHandler(String project) {
         this.project = project;

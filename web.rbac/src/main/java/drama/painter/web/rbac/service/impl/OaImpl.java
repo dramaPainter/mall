@@ -105,9 +105,9 @@ public class OaImpl implements IOa {
         }
 
         if (staff.getId() > 0) {
-            oaMapper.saveStaff(staff);
+            oaMapper.updateStaff(staff);
         } else {
-            oaMapper.insertStaff(staff);
+            oaMapper.addStaff(staff);
         }
 
         reset();
@@ -133,7 +133,7 @@ public class OaImpl implements IOa {
     public Result saveStaffPermission(int userid, List<String> permission) {
         oaMapper.removeStaffPermission(userid);
         if (!permission.isEmpty()) {
-            oaMapper.insertStaffPermission(userid, permission);
+            oaMapper.saveStaffPermission(userid, permission);
         }
         reset();
         return Result.SUCCESS;

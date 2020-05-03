@@ -17,16 +17,4 @@ public interface BaseAssert extends IAssert, BaseEnum {
         String msg = args == null ? this.getName() : String.format(this.getName(), args);
         return new BaseException(this.getValue(), msg);
     }
-
-    /**
-     * 新建一个自定义的Exception
-     *
-     * @param args 参数
-     * @param t    异常对象
-     * @return
-     */
-    @Override
-    default BaseException newException(Throwable t, Object... args) {
-        return new BaseException(t, args);
-    }
 }

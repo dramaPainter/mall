@@ -4,8 +4,6 @@ import drama.painter.core.web.misc.Permission;
 import drama.painter.core.web.misc.Result;
 import drama.painter.core.web.misc.User;
 import drama.painter.core.web.utility.Dates;
-import drama.painter.core.web.validator.DateValidator;
-import drama.painter.core.web.validator.Validator;
 import drama.painter.web.rbac.model.oa.Operation;
 import drama.painter.web.rbac.model.oa.Staff;
 import drama.painter.web.rbac.service.IOa;
@@ -21,7 +19,6 @@ import java.util.List;
  */
 @RestController
 public class OaController {
-    static final Validator DATE_VALIDATOR = new DateValidator();
     final IOa oa;
 
     public OaController(IOa oa) {

@@ -44,14 +44,14 @@ public class ClassLoader {
             return;
         }
 
-        File[] dirfiles = dir.listFiles(pathname -> pathname.isDirectory() || (pathname.getName().endsWith(".class") && !pathname.getName().contains("$")));
-        if (dirfiles == null || dirfiles.length == 0) {
+        File[] dirFiles = dir.listFiles(pathname -> pathname.isDirectory() || (pathname.getName().endsWith(".class") && !pathname.getName().contains("$")));
+        if (dirFiles == null || dirFiles.length == 0) {
             return;
         }
 
         String className;
         Class clz;
-        for (File f : dirfiles) {
+        for (File f : dirFiles) {
             if (f.isDirectory()) {
                 findClassesByFile(pkgName + "." + f.getName(), pkgPath + "/" + f.getName(), classes);
                 continue;
@@ -72,7 +72,7 @@ public class ClassLoader {
 
         JarEntry jarEntry;
         String name, className;
-        Class<?> claze;
+        Class<?> clazz;
 
         while (entry.hasMoreElements()) {
             jarEntry = entry.nextElement();
@@ -86,9 +86,9 @@ public class ClassLoader {
             }
 
             className = name.substring(0, name.length() - 6);
-            claze = loadClass(className.replace("/", "."));
-            if (claze != null) {
-                classes.add(claze);
+            clazz = loadClass(className.replace("/", "."));
+            if (clazz != null) {
+                classes.add(clazz);
             }
         }
     }

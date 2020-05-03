@@ -9,7 +9,7 @@ import java.util.List;
  * @author murphy
  */
 public class DynamicDataSourceContextHolder {
-    protected static final List<String> DATASOURCES = new ArrayList<>();
+    protected static final List<String> DATASOURCE = new ArrayList<>();
     static final ThreadLocal<String> LOCAL = new ThreadLocal<>();
 
     protected static String getDataSourceType() {
@@ -25,6 +25,6 @@ public class DynamicDataSourceContextHolder {
     }
 
     public static boolean contains(String dataSourceId) {
-        return DATASOURCES.contains(dataSourceId);
+        return DATASOURCE.contains(dataSourceId);
     }
 }

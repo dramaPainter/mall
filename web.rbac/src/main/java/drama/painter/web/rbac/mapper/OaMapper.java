@@ -38,26 +38,7 @@ public interface OaMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id")
     @Insert({"INSERT INTO zero.staff (name, password, salt, alias, avatar, status, type, platform) VALUES ",
             "(#{name}, #{password}, #{salt}, #{alias}, #{avatar}, #{status}, #{type}, #{platform})"})
-    void insertStaff(User staff);
-
-    /**
-     * 设置员工权限
-     *
-     * @param staff 员工资料
-     */
-    @Insert({"<script>INSERT INTO zero.staff_permission (userid, permission) VALUES ",
-            "<foreach item='item' collection='permission' separator=','>",
-            "(#{userid}, #{item})",
-            "</foreach></script>"})
-    void insertStaffPermission(@Param("userid") int userid, @Param("permission") List<String> permission);
-
-    /**
-     * 设置员工权限
-     *
-     * @param staff 员工资料
-     */
-    @Delete("DELETE FROM zero.staff_permission WHERE userid = #{userid}")
-    void removeStaffPermission(int userid);
+    void addStaff(User staff);
 
     /**
      * 更新员工资料
@@ -68,5 +49,24 @@ public interface OaMapper {
             "password = #{password}, alias = #{alias}, avatar = #{avatar}, ",
             "status = #{status}, type = #{type}, platform = #{platform} ",
             "WHERE id = #{id}"})
-    void saveStaff(User staff);
+    void updateStaff(User staff);
+
+    /**
+     * 设置员工权限
+     *
+     * @param userid 员工资料
+     */
+    @Insert({"<script>INSERT INTO zero.staff_permission (userid, permission) VALUES ",
+            "<foreach item='item' collection='permission' separator=','>",
+            "(#{userid}, #{item})",
+            "</foreach></script>"})
+    void saveStaffPermission(@Param("userid") int userid, @Param("permission") List<String> permission);
+
+    /**
+     * 删除员工权限
+     *
+     * @param userid 员工ID
+     */
+    @Delete("DELETE FROM zero.staff_permission WHERE userid = #{userid}")
+    void removeStaffPermission(int userid);
 }

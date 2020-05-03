@@ -29,7 +29,7 @@ import java.util.List;
 @Component
 public class AccessLog {
     static final List<String> HEADER = Arrays.asList("X-FORWARDED-FOR", "X-Real-IpTable");
-    static ThreadLocal<LocalDateTime> TIME = new ThreadLocal();
+    static final ThreadLocal<LocalDateTime> TIME = new ThreadLocal();
     @Value("${spring.application.name}")
     String project;
 
@@ -79,7 +79,7 @@ public class AccessLog {
     }
 
     @Before("cut()")
-    public void before(JoinPoint point) {
+    public void before() {
         TIME.set(LocalDateTime.now());
     }
 

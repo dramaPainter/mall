@@ -13,18 +13,18 @@ import java.util.concurrent.Callable;
 
 class FileUploader implements Callable<Result> {
     static final BASE64Decoder base64 = new BASE64Decoder();
-    boolean localized;
-    Object file;
-    String basePath;
-    String filePath;
-    String domain;
+    final boolean localized;
+    final Object file;
+    final String basePath;
+    final String filePath;
+    final String domain;
 
-    public FileUploader(boolean localized, Object file, String basePath, String filePath, String domain, int userid, long id, int i) {
+    public FileUploader(boolean localized, Object file, String basePath, String filePath, String domain) {
         this.localized = localized;
         this.file = file;
         this.basePath = basePath;
         this.domain = domain;
-        this.filePath = UploadUrl.format(filePath, userid, id, i);
+        this.filePath = filePath;
     }
 
     @Override

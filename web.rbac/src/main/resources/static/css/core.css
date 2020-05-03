@@ -1,27 +1,27 @@
 @charset "UTF-8";
 body {
-    font-family: system-ui, arial
+    font-family: system-ui, serif;
 }
 
 .red {
-    color: red
+    color: red;
 }
 
 .green {
-    color: green
+    color: green;
 }
 
 .fl {
-    float: left
+    float: left;
 }
 
 .fr {
-    float: right
+    float: right;
 }
 
 .pager {
     margin: 16px 16px 16px 0;
-    text-align: center
+    text-align: center;
 }
 
 .el-select .el-input {

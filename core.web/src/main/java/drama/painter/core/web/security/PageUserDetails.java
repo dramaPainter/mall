@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  */
 public class PageUserDetails implements UserDetails {
     final User user;
-    List<GrantedAuthority> auth;
+    final List<GrantedAuthority> auth;
 
     public PageUserDetails(User user) {
         this.user = user;

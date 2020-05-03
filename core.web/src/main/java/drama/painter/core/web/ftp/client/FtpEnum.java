@@ -36,9 +36,9 @@ public enum FtpEnum implements BaseAssert {
     SIGN_MISMATCH(-101, "签名不正确"),
 
     /**
-     * 玩家不存在
+     * 用户不存在
      */
-    USER_NOT_EXIST(-102, "玩家不存在"),
+    USER_NOT_EXIST(-102, "用户不存在"),
 
     /**
      * 没有可用的域名

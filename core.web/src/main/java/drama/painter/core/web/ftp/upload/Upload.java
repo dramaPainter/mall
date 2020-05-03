@@ -32,8 +32,9 @@ public class Upload implements IUpload {
     @Override
     public Result upload(Object file, String filePath, long id) {
         int userid = ((PageUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser().getId();
+        filePath = UploadUrl.format(filePath, userid, id, ZERO);
         try {
-            return new FileUploader(ftpConfig.isLocalized(), file, ftpConfig.getBasePath(), filePath, ftpConfig.getDomain(), userid, id, ZERO).call();
+            return new FileUploader(ftpConfig.isLocalized(), file, ftpConfig.getBasePath(), filePath, ftpConfig.getDomain()).call();
         } catch (Exception e) {
             log.error("文件上传失败", e);
             return Result.toFail(e.getMessage());
@@ -46,35 +47,27 @@ public class Upload implements IUpload {
 
         int userid = ((PageUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser().getId();
         int size = files.size();
-        List<FutureTask<Result>> list = null;
+        List<FutureTask<Result>> list = new ArrayList(size);
         try {
-            list = new ArrayList(size);
-            if (files.get(0) instanceof String) {
-                for (int i = 0; i < size; i += STEP) {
-                    FutureTask task = new FutureTask(new FileUploader(ftpConfig.isLocalized(), files.get(i + 1), ftpConfig.getBasePath(), filePath, ftpConfig.getDomain(), userid, id, i / 2));
-                    POOL.submit(task);
-                    list.add(task);
-                }
-            } else {
-                for (int i = 0; i < size; i++) {
-                    FutureTask task = new FutureTask(new FileUploader(ftpConfig.isLocalized(), files.get(i), ftpConfig.getBasePath(), filePath, ftpConfig.getDomain(), userid, id, i));
-                    POOL.submit(task);
-                    list.add(task);
-                }
+            for (int i = 0; i < size; i++) {
+                String file = UploadUrl.format(filePath, userid, id, i / 2);
+                FutureTask task = new FutureTask(new FileUploader(ftpConfig.isLocalized(), files.get(i), ftpConfig.getBasePath(), file, ftpConfig.getDomain()));
+                POOL.submit(task);
+                list.add(task);
             }
 
-            List<String> url = new ArrayList(size);
             Result r = Result.toSuccess("文件上传成功");
+            List<String> urls = new ArrayList(size);
             for (FutureTask<Result> o : list) {
                 Result temp = o.get();
                 if (temp.getCode() < ZERO) {
                     r = temp;
                     break;
                 }
-                url.add(temp.getData().toString());
+                urls.add(temp.getData().toString());
             }
 
-            r.setData(url);
+            r.setData(urls);
             return r;
         } catch (Exception e) {
             log.error("文件上传出错：", e);

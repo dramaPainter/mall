@@ -19,7 +19,6 @@ class UploadUrl {
         MAP.put("{userid%100}", (userid, id, i) -> String.valueOf(userid % 100));
         MAP.put("{id}", (userid, id, i) -> String.valueOf(id));
         MAP.put("{id%100}", (userid, id, i) -> String.valueOf(id % 100));
-        MAP.put("{id%100}", (userid, id, i) -> String.valueOf(id % 100));
         MAP.put("{yyyyMM}", (userid, id, i) -> Dates.toDate().substring(0, 7).replaceFirst(",", ""));
         MAP.put("{yyyyMMdd}", (userid, id, i) -> Dates.toDate());
         MAP.put("{yyyyMMddHHmmss}", (userid, id, i) -> Dates.toDateTimeNumber());

@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 class SuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
-    String project;
+    final String project;
 
     public SuccessHandler(String project) {
         this.project = project;

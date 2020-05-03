@@ -1,23 +1,23 @@
 package drama.painter.core.web.utility;
 
-import drama.painter.core.web.validator.DateValidator;
-import drama.painter.core.web.validator.Validator;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.regex.Pattern;
 
 /**
  * @author murphy
  */
 public class Dates {
-    static final Validator SCAN = new DateValidator();
+    static final Pattern PATTERN = Pattern.compile("^\\d{4}-\\d{2}-\\d{2}(\\s\\d{2}:\\d{2}:\\d{2})?(,\\d{3})?$");
     static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     static final DateTimeFormatter DATETIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     static final DateTimeFormatter DATETIME_MILLIS_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss,SSS");
     static final DateTimeFormatter DATE_NUMBER_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
+    @SuppressWarnings("SpellCheckingInspection")
     static final DateTimeFormatter DATETIME_NUMBER_FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    @SuppressWarnings("SpellCheckingInspection")
     static final DateTimeFormatter DATETIME_NUMBER_MILLIS_FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
     static final ZoneId CHINA = ZoneId.of("Asia/Shanghai");
     static final ZoneOffset OFFSET = ZoneOffset.ofHours(8);
@@ -47,7 +47,7 @@ public class Dates {
     }
 
     public static String modify(String date, int minute, DateTimeType returnType, String defaultValue) {
-        if (SCAN.validate(date)) {
+        if (PATTERN.matcher(date).matches()) {
             DateTimeFormatter formatter = date.contains(",") ? DATETIME_MILLIS_FORMAT : (date.contains(":") ? DATETIME_FORMAT : DATE_FORMAT);
             LocalDateTime time = LocalDateTime.parse(date, formatter).plusMinutes(minute);
             switch (returnType) {

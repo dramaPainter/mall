@@ -2217,7 +2217,7 @@
         }
 
         function ee(e) {
-            return /([(\uAC00-\uD7AF)|(\u3130-\u318F)])+/gi.test(e)
+            return /[\uAC00-\uD7AF|\u3130-\u318F]+/gi.test(e)
         }
 
         var te = r({
@@ -15434,7 +15434,7 @@
                         clearTimeout(i);
                         var r = this.$el.getBoundingClientRect().left, s = e.clientX - r, a = this.$el,
                             o = a.offsetWidth, l = a.offsetHeight, u = t.offsetTop, c = u + t.offsetHeight;
-                        n.innerHTML = '\n          <path style="pointer-events: auto;" fill="transparent" d="M' + s + " " + u + " L" + o + " 0 V" + u + ' Z" />\n          <path style="pointer-events: auto;" fill="transparent" d="M' + s + " " + c + " L" + o + " " + l + " V" + c + ' Z" />\n        '
+                        n.innerHTML = '\n          <path style="pointer-events: auto;" fill="transparent" d="M' + s + " " + u + " L" + o + " 0 V" + u + ' Z"></path>\n          <path style="pointer-events: auto;" fill="transparent" d="M' + s + " " + c + " L" + o + " " + l + " V" + c + ' Z"></path>\n        '
                     } else i || (this.hoverTimer = setTimeout(this.clearHoverZone, this.panel.config.hoverThreshold))
                 }, clearHoverZone: function () {
                     var e = this.$refs.hoverZone;

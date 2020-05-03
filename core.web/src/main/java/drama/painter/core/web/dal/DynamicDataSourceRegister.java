@@ -70,10 +70,10 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
         Map<Object, Object> ds = new HashMap<>(8);
         //添加默认数据源
         ds.put("dataSource", this.defaultDataSource);
-        DynamicDataSourceContextHolder.DATASOURCES.add("dataSource");
+        DynamicDataSourceContextHolder.DATASOURCE.add("dataSource");
         //添加其他数据源
         ds.putAll(dataSourceMap);
-        DynamicDataSourceContextHolder.DATASOURCES.addAll(dataSourceMap.keySet());
+        DynamicDataSourceContextHolder.DATASOURCE.addAll(dataSourceMap.keySet());
 
         GenericBeanDefinition bean = new GenericBeanDefinition();
         bean.setBeanClass(DynamicDataSource.class);

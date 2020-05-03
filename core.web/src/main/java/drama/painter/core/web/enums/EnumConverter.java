@@ -24,7 +24,7 @@ public class EnumConverter implements ConverterFactory<String, BaseEnum> {
         return result;
     }
 
-    class IntegerStrToEnum<T extends BaseEnum> implements Converter<String, T> {
+    static class IntegerStrToEnum<T extends BaseEnum> implements Converter<String, T> {
         final List<T> map;
 
         public IntegerStrToEnum(Class<T> enumType) {
