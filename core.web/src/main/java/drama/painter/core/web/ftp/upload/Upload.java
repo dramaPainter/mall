@@ -18,7 +18,6 @@ import java.util.concurrent.*;
 @Slf4j
 @Service
 public class Upload implements IUpload {
-    private static final int STEP = 2;
     private static final int ZERO = 0;
     private static final int POOL_SIZE = 5;
     private static ExecutorService POOL = null;
@@ -30,9 +29,7 @@ public class Upload implements IUpload {
     }
 
     @Override
-    public Result upload(Object file, String filePath, long id) {
-        int userid = ((PageUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser().getId();
-        filePath = UploadUrl.format(filePath, userid, id, ZERO);
+    public Result upload(Object file, String filePath) {
         try {
             return new FileUploader(ftpConfig.isLocalized(), file, ftpConfig.getBasePath(), filePath, ftpConfig.getDomain()).call();
         } catch (Exception e) {
@@ -42,7 +39,7 @@ public class Upload implements IUpload {
     }
 
     @Override
-    public Result uploadList(List<?> files, String filePath, long id) {
+    public Result uploadList(List<?> files, String filePath) {
         init();
 
         int userid = ((PageUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser().getId();
@@ -50,8 +47,7 @@ public class Upload implements IUpload {
         List<FutureTask<Result>> list = new ArrayList(size);
         try {
             for (int i = 0; i < size; i++) {
-                String file = UploadUrl.format(filePath, userid, id, i / 2);
-                FutureTask task = new FutureTask(new FileUploader(ftpConfig.isLocalized(), files.get(i), ftpConfig.getBasePath(), file, ftpConfig.getDomain()));
+                FutureTask task = new FutureTask(new FileUploader(ftpConfig.isLocalized(), files.get(i), ftpConfig.getBasePath(), filePath, ftpConfig.getDomain()));
                 POOL.submit(task);
                 list.add(task);
             }

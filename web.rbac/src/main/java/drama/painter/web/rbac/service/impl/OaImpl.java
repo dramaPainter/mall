@@ -5,6 +5,7 @@ import drama.painter.core.web.misc.Constant;
 import drama.painter.core.web.misc.Permission;
 import drama.painter.core.web.misc.Result;
 import drama.painter.core.web.misc.User;
+import drama.painter.core.web.utility.Dates;
 import drama.painter.core.web.utility.Encrypts;
 import drama.painter.core.web.utility.Randoms;
 import drama.painter.web.rbac.mapper.OaMapper;
@@ -21,6 +22,7 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -46,7 +48,8 @@ public class OaImpl implements IOa {
 
     @Override
     public Result uploadAvatar(String image) {
-        return upload.upload(image, "/head/{uuid}.jpg", 0);
+        String path = String.format("/head/%s/%s.jpg", Dates.toDate().substring(0, 7), UUID.randomUUID().toString());
+        return upload.upload(image, path);
     }
 
     @Override

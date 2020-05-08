@@ -40,7 +40,8 @@
         <el-table-column label="帐号名称" prop="name"></el-table-column>
         <el-table-column label="昵称" prop="alias">
             <template slot-scope="scope">
-                <img alt="" :src="scope.row.avatar" style="float: left; margin-right: 5px; max-width: 30px; max-height: 30px"/>
+                <img alt="" :src="scope.row.avatar"
+                     style="float: left; margin-right: 5px; max-width: 30px; max-height: 30px"/>
                 <label>{{scope.row.alias}}</label>
             </template>
         </el-table-column>
@@ -123,13 +124,9 @@
         </span>
     </el-dialog>
 </div>
-<link href="/js/vue/element/element-ui.css" rel="stylesheet"/>
-<link href="/css/core.css" rel="stylesheet"/>
-<script src="/js/vue/element/vue.js"></script>
-<script src="/js/vue/element/axios.js"></script>
-<script src="/js/vue/element/element-ui.js"></script>
 <script src="/js/util/core.js"></script>
-<script src="/js/util/md5.js"></script>
-<script src="/js/oa/staff.js"></script>
+<script>
+    loadScript(["/js/util/md5.js", "/js/oa/staff.js"]);
+</script>
 </body>
 </html>

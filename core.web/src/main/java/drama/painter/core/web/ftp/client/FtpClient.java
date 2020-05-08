@@ -2,6 +2,7 @@ package drama.painter.core.web.ftp.client;
 
 import drama.painter.core.web.utility.Encrypts;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
@@ -10,6 +11,7 @@ import org.apache.commons.pool2.PooledObjectFactory;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * @author murphy
@@ -25,6 +27,11 @@ public class FtpClient implements PooledObjectFactory<FTPClient> {
     @Override
     public PooledObject<FTPClient> makeObject() throws Exception {
         FTPClient ftpClient = new FTPClient();
+
+        if (log.isDebugEnabled()) {
+            ftpClient.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
+        }
+
         try {
             ftpClient.setDataTimeout(ftpConfig.getReadTimeOut());
             ftpClient.setConnectTimeout(ftpConfig.getConnectTimeOut());

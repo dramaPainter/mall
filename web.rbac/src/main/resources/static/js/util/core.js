@@ -73,24 +73,16 @@ const PICKER_OPTION = {
     }]
 }
 
-function loadScript(url, callback) {
-    if (url.indexOf(".css") === -1) {
-        let script = document.createElement('script');
-        script.src = url;
-        callback = callback || function () {
-        };
-        script.onload = script.onreadystatechange = function () {
-            if (!this.readyState || 'loaded' === this.readyState || 'complete' === this.readyState) {
-                callback();
-                this.onload = this.onreadystatechange = null;
-                this.parentNode.removeChild(this);
-            }
-        }
-        document.body.appendChild(script);
-    } else {
-        document.write("<link rel='stylesheet' href='" + url + "'/>");
-        callback();
-    }
+function loadScript(path) {
+    let script = `
+        <link href="/js/vue/element/element-ui.css" rel="stylesheet"/>
+        <link href="/css/core.css" rel="stylesheet"/>
+        <script src="/js/vue/element/vue.js"></script>
+        <script src="/js/vue/element/axios.js"></script>
+        <script src="/js/vue/element/element-ui.js"></script>
+    `;
+    path.forEach(o => script += `<script src="${o}"></script>`);
+    document.write(script);
 }
 
 function loadData(method, url, param, succeedCallback, failedCallback) {
@@ -112,5 +104,6 @@ function loadData(method, url, param, succeedCallback, failedCallback) {
         } else {
             succeedCallback(r.data);
         }
+        delete r.data;
     }).catch(r => failedCallback({code: -1, message: r}));
 }
