@@ -1,5 +1,6 @@
 package drama.painter.core.web.security;
 
+import drama.painter.core.web.enums.MenuTypeEnum;
 import drama.painter.core.web.misc.Permission;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
@@ -35,11 +36,16 @@ class AccessAllowedHandlerImpl implements AccessDecisionManager {
         if (auth.getPrincipal() instanceof String) {
             throw new InsufficientAuthenticationException("您还没有登录。");
         } else {
-            Permission p = pages.stream().filter(t -> t.getUrl().toLowerCase().equals(url)).findAny().orElse(null);
+            Permission p = pages.stream()
+                    .filter(t -> t.getType() == MenuTypeEnum.ITEM)
+                    .filter(t -> t.getUrl().toLowerCase().equals(url))
+                    .findAny()
+                    .orElse(null);
+
             if (Objects.nonNull(p)) {
                 boolean present = auth.getAuthorities().stream().anyMatch(m -> m.getAuthority().equals("ROLE_" + p.getId()));
                 if (!present) {
-                    throw new AccessDeniedException("您无权" + p.getName());
+                    throw new AccessDeniedException("您无权访问(操作)" + p.getName());
                 }
             } else {
                 throw new AccessDeniedException("页面不存在。");

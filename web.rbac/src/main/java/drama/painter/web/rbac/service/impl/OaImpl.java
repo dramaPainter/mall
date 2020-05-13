@@ -1,10 +1,12 @@
 package drama.painter.web.rbac.service.impl;
 
+import drama.painter.core.web.enums.MenuTypeEnum;
 import drama.painter.core.web.ftp.upload.IUpload;
 import drama.painter.core.web.misc.Constant;
 import drama.painter.core.web.misc.Permission;
 import drama.painter.core.web.misc.Result;
 import drama.painter.core.web.misc.User;
+import drama.painter.core.web.utility.Caches;
 import drama.painter.core.web.utility.Dates;
 import drama.painter.core.web.utility.Encrypts;
 import drama.painter.core.web.utility.Randoms;
@@ -19,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -33,8 +34,7 @@ import java.util.stream.Collectors;
 public class OaImpl implements IOa {
     static final User USER = new User();
     static final Permission QUALIFY = new Permission();
-    static final List<User> STAFF = new ArrayList();
-    static final List<Permission> PERMISSION = new ArrayList();
+
     final OaMapper oaMapper;
     final IUpload upload;
 
@@ -42,8 +42,7 @@ public class OaImpl implements IOa {
     public OaImpl(OaMapper oaMapper, IUpload upload) {
         this.oaMapper = oaMapper;
         this.upload = upload;
-        STAFF.addAll(oaMapper.getStaff());
-        PERMISSION.addAll(oaMapper.getPermission());
+        reset();
     }
 
     @Override
@@ -53,8 +52,9 @@ public class OaImpl implements IOa {
     }
 
     @Override
-    public Result<List<Staff>> listStaffs(int page, byte status, byte key, String value) {
-        List<User> list = STAFF.stream()
+    public Result<List<Staff>> listStaff(int page, byte status, byte key, String value) {
+        List<User> cache = Caches.get("GLOBAL_STAFF");
+        List<User> list = cache.stream()
                 .filter(o -> status == -1 || (status > -1 && o.getStatus().getValue() == status))
                 .filter(o -> key == -1
                         || (key == 1 && o.getId().toString().equals(value))
@@ -81,7 +81,8 @@ public class OaImpl implements IOa {
 
     @Override
     public User getStaff(String username) {
-        return STAFF.stream()
+        List<User> cache = Caches.get("GLOBAL_STAFF");
+        return cache.stream()
                 .filter(o -> o.getName().equals(username))
                 .findAny()
                 .orElse(null);
@@ -118,13 +119,9 @@ public class OaImpl implements IOa {
     }
 
     @Override
-    public List<Permission> getPermission() {
-        return PERMISSION;
-    }
-
-    @Override
     public String getStaffPermission(int userid) {
-        return StringUtils.collectionToCommaDelimitedString(STAFF.stream()
+        List<User> cache = Caches.get("GLOBAL_STAFF");
+        return StringUtils.collectionToCommaDelimitedString(cache.stream()
                 .filter(o -> o.getId() == userid)
                 .findAny()
                 .orElse(new User())
@@ -143,8 +140,53 @@ public class OaImpl implements IOa {
     }
 
     @Override
+    public Result<List<Permission>> listPermission(int page, int pageSize, byte status, byte key, String value) {
+        List<Permission> cache = Caches.get("GLOBAL_PERMISSION");
+        List<Permission> list = cache.stream()
+                .filter(o -> status == -1 || (status > -1 && o.getStatus().getValue() == status))
+                .filter(o -> key == -1
+                        || (key == 1 && o.getId().toString().equals(value))
+                        || (key == 2 && o.getName().contains(value))
+                        || (key == 3 && o.getUrl().contains(value)))
+                .collect(Collectors.toList());
+
+        int from = Math.max(page - 1, 0) * pageSize;
+        int size = list.size();
+
+        List<Permission> users = list.stream()
+                .skip(from)
+                .limit(pageSize)
+                .collect(Collectors.toList());
+
+        list.clear();
+        return Result.toData(size, users);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Result savePermission(Permission p) {
+        oaMapper.savePermission(p);
+        reset();
+        return Result.SUCCESS;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Result removePermission(int id) {
+        if (oaMapper.hasChild(id)) {
+            return Result.toFail("请先删除子节点后再删此节点");
+        } else {
+            oaMapper.removePermission(id);
+            oaMapper.removePermissionOnStaff(id);
+            reset();
+            return Result.SUCCESS;
+        }
+    }
+
+    @Override
     public boolean hasPermission(int userid, String url) {
-        List<String> permission = STAFF.stream()
+        List<User> cacheStaff = Caches.get("GLOBAL_STAFF");
+        List<String> permission = cacheStaff.stream()
                 .filter(o -> o.getId().intValue() == userid)
                 .findAny()
                 .orElse(USER)
@@ -153,7 +195,9 @@ public class OaImpl implements IOa {
         if (permission.isEmpty()) {
             return false;
         } else {
-            String id = String.valueOf(PERMISSION.stream()
+            List<Permission> cachePermission = Caches.get("GLOBAL_PERMISSION");
+            String id = String.valueOf(cachePermission.stream()
+                    .filter(o -> o.getType() == MenuTypeEnum.ITEM)
                     .filter(o -> o.getUrl().equals(url))
                     .findAny()
                     .orElse(QUALIFY)
@@ -168,19 +212,15 @@ public class OaImpl implements IOa {
     }
 
     @Override
-    public Result<List<Operation>> listOperations(int page, String startTime, String endTime, Integer timespan, String text) {
-        return Result.toData(0, Collections.EMPTY_LIST);
+    public Result<List<Operation>> listOperation(int page, String startTime, String endTime, Integer timespan, String text) {
+        return Result.toData(Result.SUCCESS.getCode(), Collections.EMPTY_LIST);
     }
 
     private void reset() {
-        synchronized (STAFF) {
-            STAFF.clear();
-            STAFF.addAll(oaMapper.getStaff());
-        }
+        Caches.remove("GLOBAL_STAFF");
+        Caches.add("GLOBAL_STAFF", oaMapper.getStaff(), -1);
 
-        synchronized (PERMISSION) {
-            PERMISSION.clear();
-            PERMISSION.addAll(oaMapper.getPermission());
-        }
+        Caches.remove("GLOBAL_PERMISSION");
+        Caches.add("GLOBAL_PERMISSION", oaMapper.getPermission(), -1);
     }
 }

@@ -28,7 +28,7 @@ public class Config {
 
         @Autowired
         public PageSecurity(IOa oa) {
-            permissionProvider = () -> oa.getPermission();
+            permissionProvider = () -> oa.listPermission(1, 99999, (byte) -1, (byte) -1, "").getData();
             userProvider = username -> {
                 User staff = oa.getStaff(username);
                 if (Objects.nonNull(staff) && CS.contains(staff.getType())) {

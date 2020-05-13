@@ -34,10 +34,10 @@ public class LoginController {
     public Result qualify(String url) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof String) {
-            return Result.toData(0, false);
+            return Result.toData(Result.SUCCESS.getCode(), false);
         } else {
             int userid = ((PageUserDetails) principal).getUser().getId();
-            return Result.toData(0, oa.hasPermission(userid, url));
+            return Result.toData(Result.SUCCESS.getCode(), oa.hasPermission(userid, url));
         }
     }
 }

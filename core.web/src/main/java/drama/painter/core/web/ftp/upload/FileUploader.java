@@ -43,7 +43,7 @@ class FileUploader implements Callable<Result> {
             FtpPool.upload(stream, basePath, filePath);
         }
 
-        return Result.toData(0, domain + filePath);
+        return Result.toData(Result.SUCCESS.getCode(), domain + filePath);
     }
 
     private void localUpload(InputStream stream, String basePath, String filePath) throws IOException {

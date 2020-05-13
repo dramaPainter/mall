@@ -13,6 +13,48 @@ import java.util.List;
 @Repository
 public interface OaMapper {
     /**
+     * 查询所有页面
+     *
+     * @return
+     */
+    @Select("SELECT * FROM zero.permission WHERE status = 1")
+    List<Permission> getPermission();
+
+    /**
+     * 添加数据到权限表
+     *
+     * @param permission 添加对象
+     */
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    @Insert({"REPLACE INTO zero.permission(id, name, url, pid, type, sort, status) VALUES",
+            "(#{id}, #{name}, #{url}, #{pid}, #{type}, #{sort}, #{status})"})
+    void savePermission(@Param("permission") Permission permission);
+
+    /**
+     * 从权限表删除数据
+     *
+     * @param id 页面ID
+     */
+    @Delete("DELETE FROM zero.permission WHERE id = #{id}")
+    void removePermission(@Param("id") int id);
+
+    /**
+     * 删除员工权限
+     *
+     * @param id 页面ID
+     */
+    @Delete("DELETE FROM zero.staff_permission WHERE permission = #{id}")
+    void removePermissionOnStaff(int id);
+
+    /**
+     * 从权限表删除数据
+     *
+     * @param id 页面ID
+     */
+    @Select("SELECT COUNT(1) FROM zero.permission WHERE pid = #{id}")
+    boolean hasChild(@Param("id") int id);
+
+    /**
      * 查询所有员工帐号
      *
      * @return
@@ -21,14 +63,6 @@ public interface OaMapper {
             "(SELECT GROUP_CONCAT(permission) FROM zero.staff_permission sp WHERE sp.userid = s.id) AS permission ",
             "FROM zero.staff s ORDER BY id DESC"})
     List<User> getStaff();
-
-    /**
-     * 查询所有页面
-     *
-     * @return
-     */
-    @Select("SELECT * FROM zero.permission WHERE status = 1")
-    List<Permission> getPermission();
 
     /**
      * 添加员工资料

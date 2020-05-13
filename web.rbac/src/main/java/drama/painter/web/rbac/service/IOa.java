@@ -15,10 +15,13 @@ public interface IOa {
     /**
      * 所有员工资料列表
      *
-     * @param page 第几页
+     * @param page   第几页
+     * @param status 状态
+     * @param key    搜索类型
+     * @param value  搜索值
      * @return
      */
-    Result<List<Staff>> listStaffs(int page, byte status, byte key, String value);
+    Result<List<Staff>> listStaff(int page, byte status, byte key, String value);
 
     /**
      * 根据员工帐号查询员工资料
@@ -47,9 +50,38 @@ public interface IOa {
     /**
      * 所有权限列表
      *
+     * @param page     第几页
+     * @param pageSize 页大小
+     * @param status   状态
+     * @param key      搜索类型
+     * @param value    搜索值
      * @return
      */
-    List<Permission> getPermission();
+    Result<List<Permission>> listPermission(int page, int pageSize, byte status, byte key, String value);
+
+    /**
+     * 更新或新增权限
+     *
+     * @param p 权限对象
+     * @return
+     */
+    Result savePermission(Permission p);
+
+    /**
+     * 删除权限（无法恢复）
+     *
+     * @param id 权限ID
+     */
+    Result removePermission(int id);
+
+    /**
+     * 查看员工是否有权限访问网址
+     *
+     * @param userid 员工ID
+     * @param url    网址
+     * @return
+     */
+    boolean hasPermission(int userid, String url);
 
     /**
      * 查询员工权限
@@ -69,15 +101,6 @@ public interface IOa {
     Result saveStaffPermission(int userid, List<String> permission);
 
     /**
-     * 查看员工是否有权限访问网址
-     *
-     * @param userid 员工ID
-     * @param url    网址
-     * @return
-     */
-    boolean hasPermission(int userid, String url);
-
-    /**
      * 查询员工操作记录，多项查询请用空格隔开
      *
      * @param page      第几页
@@ -87,5 +110,5 @@ public interface IOa {
      * @param text      搜索内容
      * @return
      */
-    Result<List<Operation>> listOperations(int page, String startTime, String endTime, Integer timespan, String text);
+    Result<List<Operation>> listOperation(int page, String startTime, String endTime, Integer timespan, String text);
 }

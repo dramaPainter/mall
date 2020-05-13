@@ -27,7 +27,7 @@ public class OaController {
 
     @GetMapping("/oa/staff")
     public Result<List<Staff>> staff(int page, byte status, byte key, String value) {
-        return oa.listStaffs(page, status, key, value);
+        return oa.listStaff(page, status, key, value);
     }
 
     @PostMapping("/oa/staff/save")
@@ -42,12 +42,12 @@ public class OaController {
 
     @GetMapping("/oa/permission")
     public Result<List<Permission>> permission() {
-        return Result.toData(0, oa.getPermission());
+        return oa.listPermission(1, 99999, (byte) -1, (byte) -1, "");
     }
 
     @GetMapping("/oa/permission/staff")
     public Result permission_staff(int userid) {
-        return Result.toData(0, oa.getStaffPermission(userid));
+        return Result.toData(Result.SUCCESS.getCode(), oa.getStaffPermission(userid));
     }
 
     @PostMapping("/oa/permission/staff/save")
@@ -59,6 +59,6 @@ public class OaController {
     public Result<List<Operation>> operation(int page, String startTime, String endTime, int timespan, String searchText) {
         startTime = Dates.modify(startTime, 0, Dates.DateTimeType.DATE_TIME_MILLIS, Dates.toDate() + " 00:00:00,000");
         endTime = Dates.modify(endTime, 0, Dates.DateTimeType.DATE_TIME_MILLIS, Dates.toDateTime() + ",000");
-        return oa.listOperations(page, startTime, endTime, timespan, searchText);
+        return oa.listOperation(page, startTime, endTime, timespan, searchText);
     }
 }

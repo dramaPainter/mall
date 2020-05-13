@@ -30,3 +30,15 @@ database:
         username: root
         password: 535002030102
         pool-name: master
+
+ftp:
+    domain: http://127.0.0.1:3017
+    host: 127.0.0.1
+    port: 21
+    username: ftpUploader
+    password: 123123
+    bufferSize: 8096
+    connectTimeOut: 10000
+    readTimeOut: 10000
+    basePath: /private/demo/github/mall/web.rbac/target/classes/static/upload
+    localized: true

@@ -28,6 +28,6 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public Result handler(Exception e) {
         log.error("未处理的错误", e);
-        return Result.toMessage(-1, e.getMessage());
+        return Result.toMessage(Result.FAIL.getCode(), e.getMessage());
     }
 }
