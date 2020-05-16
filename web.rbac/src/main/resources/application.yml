@@ -26,7 +26,7 @@ redis:
 database:
     names: master
     master:
-        url: jdbc:mysql://127.0.0.1
+        url: jdbc:mysql://127.0.0.1/zero
         username: root
         password: 535002030102
         pool-name: master
@@ -40,5 +40,5 @@ ftp:
     bufferSize: 8096
     connectTimeOut: 10000
     readTimeOut: 10000
-    basePath: /private/demo/github/mall/web.rbac/target/classes/static/upload
+    basePath: /private/demo/github/mall/web.rbac/target/classes/static
     localized: true

@@ -21,6 +21,10 @@ const ENUM = {};
 ENUM.status = new Enum()
     .add('DISABLE', '冻结', 0)
     .add('ENABLE', '启用', 1);
+ENUM.menuType = new Enum()
+    .add('MENU', '菜单', 2)
+    .add('PAGE', '页面', 1)
+    .add('ITEM', '子项', 0);
 ENUM.platform = new Enum()
     .add('ALL', '全平台', 0)
     .add('PLATFORM_1', '默认', 1)
@@ -106,4 +110,19 @@ function loadData(method, url, param, succeedCallback, failedCallback) {
         }
         delete r.data;
     }).catch(r => failedCallback({code: -1, message: r}));
+}
+
+function loadTable(app, url, callback) {
+    callback = callback || function () {
+    };
+    loadData("get", url, {}, r => {
+        app.tableData = r.data;
+        app.rowCount = r.code;
+        app.loading = false;
+        delete r.data;
+        callback();
+    }, e => {
+        app.loading = false;
+        app.$alert(e.message, '温馨提示');
+    });
 }

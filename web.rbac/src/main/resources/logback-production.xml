@@ -24,39 +24,36 @@
         </encoder>
     </appender>
 
-    <appender name="http" class="drama.painter.core.web.log.ElasticSearchLogAppender">
-        <format>HTTP</format>
+    <appender name="http" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.path}/http/http.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log.path}/http/http.%d{yyyyMMdd}.zip</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date - %msg%n</pattern>
+        </encoder>
     </appender>
-    <!--
-        <appender name="http" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>${log.path}/http/http.log</file>
-            <append>true</append>
-            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${log.path}/http/http.%d{yyyyMMdd}.zip</fileNamePattern>
-                <maxHistory>30</maxHistory>
-            </rollingPolicy>
-            <encoder>
-                <pattern>%date - %msg%n</pattern>
-            </encoder>
-        </appender>
-    -->
+
+    <appender name="backup" class="drama.painter.core.web.log.CustomLogAppender"></appender>
+
     <root level="INFO">
-        <appender-ref ref="api"/>
+        <appender-ref ref="backup"/>
     </root>
+
+    <logger name="api" level="INFO" additivity="false">
+        <appender-ref ref="api"/>
+    </logger>
 
     <logger name="sql" level="DEBUG" additivity="false">
         <appender-ref ref="sql"/>
     </logger>
 
-    <logger name="http" level="DEBUG" additivity="false">
+    <logger name="http" level="INFO" additivity="false">
         <appender-ref ref="http"/>
     </logger>
 
-    <logger name="org.springframework.boot.actuate.endpoint.EndpointId" level="ERROR">
-        <appender-ref ref="api"/>
-    </logger>
-
-    <logger name="com.netflix.config.sources.URLConfigurationSource" level="ERROR">
-        <appender-ref ref="api"/>
-    </logger>
+    <logger name="org.springframework.boot.actuate.endpoint.EndpointId" level="ERROR"></logger>
+    <logger name="com.netflix.config.sources.URLConfigurationSource" level="ERROR"></logger>
 </configuration>

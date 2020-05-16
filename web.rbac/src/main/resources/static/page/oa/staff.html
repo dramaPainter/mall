@@ -4,25 +4,29 @@
     <meta charset="utf-8"/>
     <title>员工帐号管理</title>
     <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <style type="text/css">
+        .tag .el-tag {
+           margin-right: 5px;
+        }
+    </style>
 </head>
 <body>
 <div id="app">
     <!-- 导航栏 -->
+    <el-breadcrumb class="pager" separator-class="el-icon-arrow-right">
+        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+        <el-breadcrumb-item>系统管理</el-breadcrumb-item>
+        <el-breadcrumb-item>员工帐号管理</el-breadcrumb-item>
+    </el-breadcrumb>
+    <!-- 搜索功能 -->
     <div class="navigator">
-        <el-breadcrumb class="pager" separator-class="el-icon-arrow-right">
-            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-            <el-breadcrumb-item>员工帐号管理</el-breadcrumb-item>
-        </el-breadcrumb>
-        <!-- 搜索功能 -->
-        <el-select size="small" v-model="status">
-            <el-option label="帐号状态" value="-1"></el-option>
+        <el-select size="small" v-model="status" placeholder="帐号状态" clearable>
             <el-option :key="item.value" :label="item.name" :value="item.value" v-for="item in enums.status"></el-option>
         </el-select>
         <el-input class="input-with-select" placeholder="请输入内容" size="small" v-model="searchText">
-            <el-select slot="prepend" v-model="searchType">
-                <el-option label="搜索类型" value="-1"></el-option>
+            <el-select slot="prepend" v-model="searchType" clearable>
                 <el-option label="帐号ID" value="1"></el-option>
-                <el-option label="帐号名" value="2"></el-option>
+                <el-option label="帐号名称" value="2"></el-option>
                 <el-option label="帐号昵称" value="3"></el-option>
             </el-select>
             <el-button @click="btnSearchClick" icon="el-icon-search" slot="append"></el-button>
@@ -44,22 +48,21 @@
                 <label>{{ scope.row.alias }}</label>
             </template>
         </el-table-column>
-        <el-table-column label="类型" prop="type">
-            <template slot-scope="scope">{{ enums.staffType.getName(scope.row.type) }}</template>
-        </el-table-column>
-        <el-table-column label="平台" prop="platform">
-            <template slot-scope="scope">{{ enums.platform.getName(scope.row.platform) }}</template>
+        <el-table-column label="角色" prop="role" class-name="tag">
+            <template slot-scope="scope">
+                <el-tag size="medium" v-for="item in scope.row.role" type="danger">{{ upsert.toName(item) }}</el-tag>
+            </template>
         </el-table-column>
         <el-table-column label="状态" prop="status">
             <template slot-scope="scope">
                 <label :class="scope.row.status == enums.status.ENABLE.value ? '' : 'red'">{{ enums.status.getName(scope.row.status) }}</label>
             </template>
         </el-table-column>
-        <el-table-column label="操作" v-if="editQualify || permissionQualify">
+        <el-table-column label="操作" v-if="editQualify || removeQualify">
             <template slot-scope="scope">
                 <el-button-group>
                     <el-button @click="toEdit(scope.row)" icon="el-icon-edit" size="mini" v-if="editQualify"></el-button>
-                    <el-button @click="toQualify(scope.row)" icon="el-icon-set-up" size="mini" v-if="permissionQualify"></el-button>
+                    <el-button @click="toRemove(scope.row)" icon="el-icon-delete" size="mini" v-if="removeQualify"></el-button>
                 </el-button-group>
             </template>
         </el-table-column>
@@ -86,14 +89,9 @@
                     <i class="el-icon-plus avatar-uploader-icon" v-else></i>
                 </el-upload>
             </el-form-item>
-            <el-form-item :rules="[{ required: true, message: '请选择帐号类型', trigger: 'change' }]" label="帐号类型" prop="type">
-                <el-select placeholder="请选择帐号类型" v-model="staff.type">
-                    <el-option :key="item.value" :label="item.name" :value="item.value" v-for="item in enums.staffType"></el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item :rules="[{ required: true, message: '请选择平台', trigger: 'change' }]" label="平台" prop="platform">
-                <el-select placeholder="请选择平台" v-model="staff.platform">
-                    <el-option :key="item.value" :label="item.name" :value="item.value" v-for="item in enums.platform"></el-option>
+            <el-form-item label="帐号角色" prop="role">
+                <el-select multiple v-model="staff.role" class="wide_select">
+                    <el-option v-for="item in roles" :key="item.id" :label="item.name" :value="item.id"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item :rules="[{ required: true, message: '请选择状态', trigger: 'change' }]" label="状态" prop="status">
@@ -108,17 +106,7 @@
         </span>
     </el-dialog>
 </div>
-<!-- 设置权限 -->
-<div id="permission">
-    <el-dialog :title="dialogTitle" :visible.sync="dialogEnabled" width="480px">
-        <el-tree :data="data" node-key="id" ref="treeviewer" default-expand-all show-checkbox></el-tree>
-        <span class="dialog-footer" slot="footer">
-            <el-button @click="dialogEnabled=false">取 消</el-button>
-            <el-button @click="onSubmit('staff')" type="primary">确 定</el-button>
-        </span>
-    </el-dialog>
-</div>
 <script src="/js/util/core.js"></script>
-<script>loadScript(["/js/util/md5.js", "/js/oa/staff.js"])</script>
+<script>loadScript(["/js/util/md5.js", "staff.js"])</script>
 </body>
 </html>

@@ -6,6 +6,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,7 +19,7 @@ public class PageUserDetails implements UserDetails {
 
     public PageUserDetails(User user) {
         this.user = user;
-        this.auth = user.getPermission().stream()
+        this.auth = user.getRole() == null ? Collections.EMPTY_LIST : user.getRole().stream()
                 .map(o -> new SimpleGrantedAuthority("ROLE_" + o))
                 .collect(Collectors.toList());
     }

@@ -1,10 +1,9 @@
 package drama.painter.core.web.security;
 
-import drama.painter.core.web.misc.Permission;
+import drama.painter.core.web.misc.User;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
-import java.util.List;
-import java.util.function.Supplier;
+import java.util.function.Consumer;
 
 /**
  * 使用页面鉴权模式
@@ -12,7 +11,7 @@ import java.util.function.Supplier;
  * @author murphy
  */
 public class PageSecurityConfig extends LoginSecurityConfig {
-    protected Supplier<List<Permission>> permissionProvider;
+    protected Consumer<User> permissionChecker;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -21,7 +20,7 @@ public class PageSecurityConfig extends LoginSecurityConfig {
                 .accessDeniedHandler(new AccessDeniedHandlerImpl())
                 .and()
                 .authorizeRequests()
-                .accessDecisionManager(new AccessAllowedHandlerImpl(permissionProvider.get()));
+                .accessDecisionManager(new AccessAllowedHandlerImpl(permissionChecker));
     }
 }
 

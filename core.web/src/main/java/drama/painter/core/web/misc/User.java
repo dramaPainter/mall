@@ -1,17 +1,15 @@
 package drama.painter.core.web.misc;
 
-import drama.painter.core.web.enums.PlatformEnum;
-import drama.painter.core.web.enums.StaffTypeEnum;
 import drama.painter.core.web.enums.StatusEnum;
 import jdk.nashorn.internal.objects.annotations.Setter;
 import lombok.Data;
-import lombok.Getter;
 import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author murphy
@@ -23,21 +21,15 @@ public class User {
     String name;
     String alias;
     String avatar;
-    StatusEnum status;
-    PlatformEnum platform;
-    StaffTypeEnum type;
-    String password;
+    List<String> role;
     String salt;
-
-    @Getter
-    List<String> permission;
+    String password;
+    StatusEnum status;
 
     @Setter
-    public void setPermission(String permission) {
-        if (StringUtils.isEmpty(permission)) {
-            this.permission = Collections.EMPTY_LIST;
-        } else {
-            this.permission = Arrays.asList(permission.split(","));
+    public void setRole(String role) {
+        if (!StringUtils.isEmpty(role)) {
+            this.role = Arrays.asList(role.split(","));
         }
     }
 }

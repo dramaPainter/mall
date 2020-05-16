@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8"/>
+    <title>权限管理</title>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+</head>
+<body>
+<div id="app">
+    <!-- 导航栏 -->
+    <el-breadcrumb class="pager" separator-class="el-icon-arrow-right">
+        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+        <el-breadcrumb-item>系统管理</el-breadcrumb-item>
+        <el-breadcrumb-item>权限管理</el-breadcrumb-item>
+    </el-breadcrumb>
+    <!-- 搜索功能 -->
+    <div class="navigator">
+        <el-select size="small" v-model="status" placeholder="权限状态" clearable>
+            <el-option :key="item.value" :label="item.name" :value="item.value" v-for="item in enums.status"></el-option>
+        </el-select>
+        <el-input class="input-with-select" placeholder="请输入内容" size="small" v-model="searchText">
+            <el-select slot="prepend" v-model="searchType" placeholder="搜索类型" clearable>
+                <el-option label="权限ID" value="1"></el-option>
+                <el-option label="权限名称" value="2"></el-option>
+                <el-option label="权限URL" value="3"></el-option>
+            </el-select>
+            <el-button @click="btnSearchClick" icon="el-icon-search" slot="append"></el-button>
+        </el-input>
+        <div class="fr">
+            <el-button @click="toAdd" icon="el-icon-plus" size="small" v-if="editQualify"></el-button>
+            <el-button @click="search" icon="el-icon-refresh" size="small"></el-button>
+        </div>
+    </div>
+    <!-- 表格 -->
+    <el-table :border="true" :data="tableData" element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" size="mini" v-loading="loading">
+        <el-table-column label="权限ID" prop="id"></el-table-column>
+        <el-table-column label="权限名称" prop="name"></el-table-column>
+        <el-table-column label="权限URL" prop="url"></el-table-column>
+        <el-table-column label="上级ID" prop="pid"></el-table-column>
+        <el-table-column label="类型" prop="type">
+            <template slot-scope="scope">{{ enums.menuType.getName(scope.row.type) }}</template>
+        </el-table-column>
+        <el-table-column label="排序" prop="sort"></el-table-column>
+        <el-table-column label="状态" prop="status">
+            <template slot-scope="scope">
+                <label :class="scope.row.status == enums.status.ENABLE.value ? '' : 'red'">{{ enums.status.getName(scope.row.status) }}</label>
+            </template>
+        </el-table-column>
+        <el-table-column label="操作" v-if="editQualify || removeQualify">
+            <template slot-scope="scope">
+                <el-button-group>
+                    <el-button @click="toEdit(scope.row)" icon="el-icon-edit" size="mini" v-if="editQualify"></el-button>
+                    <el-button @click="toRemove(scope.row)" icon="el-icon-delete" size="mini" v-if="removeQualify"></el-button>
+                </el-button-group>
+            </template>
+        </el-table-column>
+    </el-table>
+    <!-- 分页 -->
+    <el-pagination :current-page="page" :page-size="15" :total="rowCount" @current-change="pageChanged" class="pager" layout="total, prev, pager, next" slot="paging"></el-pagination>
+</div>
+<!-- 添加删除权限 -->
+<div id="upsert">
+    <el-dialog :title="dialogTitle" :visible.sync="dialogEnabled" width="480px">
+        <el-form :model="permission" label-width="80px" ref="permission">
+            <el-form-item :rules="[{ required: true, message: '请填写权限名称', trigger: 'blur' }]" label="权限ID" prop="id">
+                <el-input v-model="permission.id" :disabled="id_disabled"></el-input>
+            </el-form-item>
+            <el-form-item :rules="[{ required: true, message: '请填写权限名称', trigger: 'blur' }]" label="权限名称" prop="name">
+                <el-input v-model="permission.name"></el-input>
+            </el-form-item>
+            <el-form-item :rules="[{ required: permission.type < 2, message: '请填写权限URL', trigger: 'blur' }]" label="权限URL" prop="url">
+                <el-input v-model="permission.url"></el-input>
+            </el-form-item>
+            <el-form-item :rules="[{ required: true, message: '请填写上级ID', trigger: 'blur' }]" label="上级ID" prop="pid">
+                <el-input v-model="permission.pid"></el-input>
+            </el-form-item>
+            <el-form-item :rules="[{ required: true, message: '请选择权限类型', trigger: 'change' }]" label="权限类型" prop="type">
+                <el-select placeholder="请选择权限类型" v-model="permission.type">
+                    <el-option :key="item.value" :label="item.name" :value="item.value" v-for="item in enums.menuType"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item :rules="[{ required: true, message: '请填写排序值', trigger: 'blur' }]" label="排序" prop="sort">
+                <el-input v-model="permission.sort"></el-input>
+            </el-form-item>
+            <el-form-item :rules="[{ required: true, message: '请选择状态', trigger: 'change' }]" label="状态" prop="status">
+                <el-radio-group v-model="permission.status">
+                    <el-radio-button :key="item.value" :label="item.value" v-for="item in enums.status">{{item.name}}</el-radio-button>
+                </el-radio-group>
+            </el-form-item>
+        </el-form>
+        <span class="dialog-footer" slot="footer">
+            <el-button @click="dialogEnabled=false">取 消</el-button>
+            <el-button @click="onSubmit('permission')" type="primary">确 定</el-button>
+        </span>
+    </el-dialog>
+</div>
+<!-- 设置权限 -->
+<script src="/js/util/core.js"></script>
+<script>loadScript(["permission.js"])</script>
+</body>
+</html>

@@ -17,4 +17,8 @@ public class Page {
         this.offset = page <= 0 ? 0 : (page - 1) * (size <= 0 ? Constant.PAGE_SIZE : size);
         this.size = size;
     }
+
+    public Page(int page) {
+        this(page, Constant.PAGE_SIZE);
+    }
 }

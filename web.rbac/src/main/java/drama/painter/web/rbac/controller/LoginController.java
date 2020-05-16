@@ -2,7 +2,8 @@ package drama.painter.web.rbac.controller;
 
 import drama.painter.core.web.misc.Result;
 import drama.painter.core.web.security.PageUserDetails;
-import drama.painter.web.rbac.service.IOa;
+import drama.painter.web.rbac.service.oa.IOa;
+import drama.painter.web.rbac.service.oa.IPermission;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,10 +14,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 public class LoginController {
-    final IOa oa;
+    final IPermission permission;
 
-    public LoginController(IOa oa) {
-        this.oa = oa;
+    public LoginController(IPermission permission) {
+        this.permission = permission;
     }
 
     @GetMapping("/login/login")
@@ -37,7 +38,7 @@ public class LoginController {
             return Result.toData(Result.SUCCESS.getCode(), false);
         } else {
             int userid = ((PageUserDetails) principal).getUser().getId();
-            return Result.toData(Result.SUCCESS.getCode(), oa.hasPermission(userid, url));
+            return Result.toData(Result.SUCCESS.getCode(), permission.hasPermission(userid, url));
         }
     }
 }

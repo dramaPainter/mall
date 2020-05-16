@@ -1,7 +1,6 @@
 package drama.painter.core.web.security;
 
-import drama.painter.core.web.enums.MenuTypeEnum;
-import drama.painter.core.web.misc.Permission;
+import drama.painter.core.web.misc.User;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
@@ -10,17 +9,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.FilterInvocation;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.function.Consumer;
 
 import static drama.painter.core.web.security.LoginSecurityConfig.AUTHORIZED_SUFFIX_ITEM;
 import static drama.painter.core.web.security.LoginSecurityConfig.AUTHORIZED_URL_PATH;
 
 class AccessAllowedHandlerImpl implements AccessDecisionManager {
-    final List<Permission> pages;
+    final Consumer<User> permissionChecker;
 
-    public AccessAllowedHandlerImpl(List<Permission> pages) {
-        this.pages = pages;
+    public AccessAllowedHandlerImpl(Consumer<User> permissionChecker) {
+        this.permissionChecker = permissionChecker;
     }
 
     @Override
@@ -36,20 +34,7 @@ class AccessAllowedHandlerImpl implements AccessDecisionManager {
         if (auth.getPrincipal() instanceof String) {
             throw new InsufficientAuthenticationException("您还没有登录。");
         } else {
-            Permission p = pages.stream()
-                    .filter(t -> t.getType() == MenuTypeEnum.ITEM)
-                    .filter(t -> t.getUrl().toLowerCase().equals(url))
-                    .findAny()
-                    .orElse(null);
-
-            if (Objects.nonNull(p)) {
-                boolean present = auth.getAuthorities().stream().anyMatch(m -> m.getAuthority().equals("ROLE_" + p.getId()));
-                if (!present) {
-                    throw new AccessDeniedException("您无权访问(操作)" + p.getName());
-                }
-            } else {
-                throw new AccessDeniedException("页面不存在。");
-            }
+            permissionChecker.accept(((PageUserDetails) auth.getPrincipal()).getUser());
         }
     }
 

@@ -50,7 +50,7 @@ class FileUploader implements Callable<Result> {
         File file = new File(basePath + filePath);
         String[] dirs = filePath.split("/");
         String tempPath = basePath;
-        for (int i = 1; i < dirs.length - 1; i++) {
+        for (int i = 0; i < dirs.length - 1; i++) {
             tempPath += "/" + dirs[i];
             if (!Files.exists(Paths.get(tempPath))) {
                 Files.createDirectory(Paths.get(tempPath));

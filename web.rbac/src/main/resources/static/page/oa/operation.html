@@ -17,8 +17,7 @@
         <!-- 搜索功能 -->
         <el-date-picker :clearable="false" :picker-options="pickerOptions" end-placeholder="结束日期" range-separator="至" size="small" start-placeholder="开始日期" type="datetimerange" v-model="datetime" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
         <el-input class="input-with-select" placeholder="请输入内容" size="small" v-model="searchText">
-            <el-select slot="prepend" v-model="timespan">
-                <el-option label="用时" value="0"></el-option>
+            <el-select slot="prepend" v-model="timespan" placeholder="用时" clearable>
                 <el-option label="1秒" value="1000"></el-option>
                 <el-option label="3秒" value="3000"></el-option>
                 <el-option label="5秒" value="5000"></el-option>
@@ -48,6 +47,6 @@
 </div>
 </div>
 <script src="/js/util/core.js"></script>
-<script>loadScript(["/js/oa/operation.js"])</script>
+<script>loadScript(["operation.js"])</script>
 </body>
 </html>
