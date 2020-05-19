@@ -1,6 +1,8 @@
 package drama.painter.web.rbac.service.impl.oa;
 
 import drama.painter.core.web.enums.MenuTypeEnum;
+import drama.painter.core.web.enums.SearchEnum;
+import drama.painter.core.web.enums.StatusEnum;
 import drama.painter.core.web.misc.Permission;
 import drama.painter.core.web.misc.Result;
 import drama.painter.core.web.misc.User;
@@ -35,14 +37,14 @@ public class PermissionImpl implements IPermission {
     }
 
     @Override
-    public Result<List<Permission>> list(int page, int pageSize, Byte status, Byte key, String value) {
+    public Result<List<Permission>> list(int page, int pageSize, StatusEnum status, SearchEnum key, String value) {
         List<Permission> cache = Caches.get(OaImpl.PERMISSION);
         List<Permission> list = cache.stream()
-                .filter(o -> Objects.isNull(status) || o.getStatus().getValue() == status)
+                .filter(o -> Objects.isNull(status) || o.getStatus() == status)
                 .filter(o -> Objects.isNull(key)
-                        || (key == 1 && o.getId().toString().equals(value))
-                        || (key == 2 && o.getName().contains(value))
-                        || (key == 3 && o.getUrl().contains(value)))
+                        || (key == SearchEnum.ID && o.getId().toString().equals(value))
+                        || (key == SearchEnum.NAME && o.getName().contains(value))
+                        || (key == SearchEnum.URL && o.getUrl().contains(value)))
                 .collect(Collectors.toList());
 
         int from = Math.max(page - 1, 0) * pageSize;

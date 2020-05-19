@@ -49,7 +49,7 @@ public class AccessLog {
         String returnValue = "NULL";
         String parameter;
 
-        if ("/login/qualify".equals(url)) {
+        if ("/dir/qualify".equals(url)) {
             return;
         } else if ("POST".equals(request.getMethod())) {
             if (args.length > 0 && !log.isDebugEnabled() && args[0] instanceof User) {

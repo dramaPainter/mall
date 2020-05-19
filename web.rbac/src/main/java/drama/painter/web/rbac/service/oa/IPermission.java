@@ -1,5 +1,7 @@
 package drama.painter.web.rbac.service.oa;
 
+import drama.painter.core.web.enums.SearchEnum;
+import drama.painter.core.web.enums.StatusEnum;
 import drama.painter.core.web.misc.Permission;
 import drama.painter.core.web.misc.Result;
 
@@ -19,7 +21,7 @@ public interface IPermission {
      * @param value    搜索值
      * @return
      */
-    Result<List<Permission>> list(int page, int pageSize, Byte status, Byte key, String value);
+    Result<List<Permission>> list(int page, int pageSize, StatusEnum status, SearchEnum key, String value);
 
     /**
      * 更新或新增权限

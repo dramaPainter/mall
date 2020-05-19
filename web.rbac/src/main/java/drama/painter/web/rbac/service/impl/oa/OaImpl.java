@@ -13,7 +13,6 @@ import drama.painter.web.rbac.service.oa.IPermission;
 import drama.painter.web.rbac.service.oa.IStaff;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
@@ -39,6 +38,7 @@ public class OaImpl implements IOa {
     final HttpServletRequest request;
 
     @Autowired
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public OaImpl(IStaff staff, IPermission permission, HttpServletRequest request) {
         this.staff = staff;
         this.permission = permission;

@@ -20,18 +20,18 @@ public class LoginController {
         this.permission = permission;
     }
 
-    @GetMapping("/login/login")
+    @GetMapping("/dir/login")
     public String login() {
-        return "login/login";
+        return "dir/login";
     }
 
-    @GetMapping("/login/error")
+    @GetMapping("/dir/error")
     public String error() {
-        return "login/error";
+        return "dir/error";
     }
 
     @ResponseBody
-    @GetMapping("/login/qualify")
+    @GetMapping("/dir/qualify")
     public Result qualify(String url) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof String) {

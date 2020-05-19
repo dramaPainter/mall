@@ -1,27 +1,30 @@
 package drama.painter.core.web.enums;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * @author murphy
  */
-public enum StatusEnum implements BaseEnum {
+public enum SearchEnum implements BaseEnum {
     /**
-     * 冻结
+     * 帐号ID
      */
-    DISABLE(0, "冻结"),
+    ID(1, "ID"),
     /**
-     * 启用
+     * 按名称查询
      */
-    ENABLE(1, "启用");
+    NAME(2, "名称"),
+    /**
+     * 按昵称查询
+     */
+    ALIAS(3, "昵称"),
+    /**
+     * 按URL查询
+     */
+    URL(4, "URL");
 
     final int value;
     final String name;
 
-    StatusEnum(int value, String name) {
+    SearchEnum(int value, String name) {
         this.value = value;
         this.name = name;
     }
@@ -36,3 +39,4 @@ public enum StatusEnum implements BaseEnum {
         return name;
     }
 }
+

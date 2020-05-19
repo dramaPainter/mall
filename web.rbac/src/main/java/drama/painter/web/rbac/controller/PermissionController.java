@@ -1,5 +1,7 @@
 package drama.painter.web.rbac.controller;
 
+import drama.painter.core.web.enums.SearchEnum;
+import drama.painter.core.web.enums.StatusEnum;
 import drama.painter.core.web.misc.Permission;
 import drama.painter.core.web.misc.Result;
 import drama.painter.core.web.misc.User;
@@ -27,7 +29,7 @@ public class PermissionController {
     }
 
     @GetMapping("/oa/permission")
-    public Result<List<Permission>> permission(int page, int pageSize, Byte status, Byte key, String value) {
+    public Result<List<Permission>> permission(int page, int pageSize, StatusEnum status, SearchEnum key, String value) {
         return permission.list(page, pageSize, status, key, value);
     }
 

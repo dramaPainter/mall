@@ -11,6 +11,9 @@ const vue = new Vue({
         pickerOptions: PICKER_OPTION
     },
     methods: {
+        mounted() {
+            this.search();
+        },
         pageChanged(pageid) {
             this.page = pageid;
             this.search();
@@ -38,5 +41,3 @@ const vue = new Vue({
         }
     }
 });
-
-vue.search();

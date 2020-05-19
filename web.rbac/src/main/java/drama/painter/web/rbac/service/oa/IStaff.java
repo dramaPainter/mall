@@ -1,5 +1,7 @@
 package drama.painter.web.rbac.service.oa;
 
+import drama.painter.core.web.enums.SearchEnum;
+import drama.painter.core.web.enums.StatusEnum;
 import drama.painter.core.web.misc.Result;
 import drama.painter.core.web.misc.User;
 import drama.painter.web.rbac.model.oa.Role;
@@ -20,7 +22,7 @@ public interface IStaff {
      * @param value  搜索值
      * @return
      */
-    Result<List<Staff>> list(int page, Byte status, Byte key, String value);
+    Result<List<Staff>> list(int page, StatusEnum status, SearchEnum key, String value);
 
     /**
      * 添加或者更新员工资料

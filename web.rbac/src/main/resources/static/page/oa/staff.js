@@ -2,7 +2,7 @@ let upsert = new Vue({
     el: '#upsert',
     data: {
         roles: [],
-        staff: {},
+        staff: {id: 0, name: '', password: '', alias: '', avatar: '', role: null, status: null},
         dialogTitle: "",
         dialogEnabled: false,
         username_disabled: false,
@@ -12,7 +12,7 @@ let upsert = new Vue({
     methods: {
         loadRoles() {
             return new Promise(load => {
-                loadData("get", "/oa/role?page=1&pageSize=99999&status=1&key=-1", {}, r => {
+                loadData("get", "/oa/role?page=1&pageSize=9999", {}, r => {
                     if (r.code >= 0) {
                         r.data.forEach(o => o.id = o.id + "");
                         this.roles = r.data;
@@ -64,9 +64,9 @@ let upsert = new Vue({
             this.$refs[formName].validate((valid) => {
                 if (valid) {
                     this.staff.password = this.staff.password.length == 0 ? "" : MD5(this.staff.password);
-                    let temp = this.staff;
-                    temp.role = this.staff.role.join(",");
-                    loadData("post", "/oa/staff/save", temp, r => {
+                    let copy = Object.assign({}, this.staff);
+                    copy.role = copy.role == null ? "" : copy.role.join(",");
+                    loadData("post", "/oa/staff/save", copy, r => {
                         if (r.code == 0) {
                             this.dialogEnabled = false;
                             this.$message.success(r.message);
@@ -127,6 +127,7 @@ let vue = new Vue({
         rowCount: 0,
         page: 1,
         status: "",
+        password: "",
         searchType: "",
         searchText: "",
         loading: false,
@@ -136,13 +137,15 @@ let vue = new Vue({
     },
     mounted: function () {
         upsert.loadRoles().then(() => {
-            loadData("get", "/login/qualify?url=/oa/staff/save", {}, r => {
+            loadData("get", "/dir/qualify?url=/oa/staff/save", {}, r => {
                 this.editQualify = r.data == true;
             }, null);
-            loadData("get", "/login/qualify?url=/oa/staff/remove", {}, r => {
+            loadData("get", "/dir/qualify?url=/oa/staff/remove", {}, r => {
                 this.removeQualify = r.data == true;
             }, null);
         });
+
+        this.search();
     },
     methods: {
         toAdd() {
@@ -164,9 +167,7 @@ let vue = new Vue({
         search() {
             this.loading = true;
             let url = "/oa/staff?page=" + this.page + "&status=" + this.status + "&key=" + this.searchType + "&value=" + encodeURIComponent(this.searchText);
-            loadTable(this, url, () => this.tableData.forEach(o => o.password = ""));
+            loadTable(this, url);
         }
     }
 });
-
-vue.search();

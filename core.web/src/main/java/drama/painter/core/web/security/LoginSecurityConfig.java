@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * @author murphy
  */
 public class LoginSecurityConfig extends WebSecurityConfigurerAdapter {
-    public static final String AUTHORIZED_URL_PATH = "/login/";
+    public static final String AUTHORIZED_URL_PATH = "/dir/";
     public static final String USER_PARAMETER = "loginUser";
     public static final String PASSWORD_PARAMETER = "loginPassword";
 
@@ -44,7 +44,7 @@ public class LoginSecurityConfig extends WebSecurityConfigurerAdapter {
             .collect(Collectors.toList());
 
     static final PasswordAuth PASSWORD_AUTH = new PasswordAuth();
-    static final String LOGIN_URL = "/login/login";
+    static final String LOGIN_URL = "/dir/login";
     static final String SECRET_KEY = "Web-Security-Client-Key";
     protected Function<String, User> userProvider;
 
@@ -69,10 +69,10 @@ public class LoginSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(AUTHORIZED_URL_PATH + "**").permitAll()
                 .anyRequest().authenticated()
                 .and().rememberMe().rememberMeServices(getRememberMeServices())
-                .and().logout().logoutUrl("/login/logout").logoutSuccessUrl("/")
+                .and().logout().logoutUrl("/dir/logout").logoutSuccessUrl("/")
                 .invalidateHttpSession(true).clearAuthentication(true)
                 .and().formLogin().usernameParameter(USER_PARAMETER).passwordParameter(PASSWORD_PARAMETER)
-                .loginProcessingUrl("/login/security").loginPage(LOGIN_URL).defaultSuccessUrl("/")
+                .loginProcessingUrl("/dir/security").loginPage(LOGIN_URL).defaultSuccessUrl("/")
                 .successHandler(new SuccessHandler(project)).failureHandler(new FailureHandler(project))
                 .permitAll();
     }

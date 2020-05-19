@@ -1,6 +1,7 @@
 package drama.painter.web.rbac.service.impl.oa;
 
-import drama.painter.core.web.misc.Constant;
+import drama.painter.core.web.enums.SearchEnum;
+import drama.painter.core.web.enums.StatusEnum;
 import drama.painter.core.web.misc.Result;
 import drama.painter.core.web.utility.Caches;
 import drama.painter.web.rbac.mapper.oa.RoleMapper;
@@ -33,21 +34,21 @@ public class RoleImpl implements IRole {
     }
 
     @Override
-    public Result<List<Role>> list(int page, Byte status, Byte key, String value) {
+    public Result<List<Role>> list(int page, int pageSize, StatusEnum status, SearchEnum key, String value) {
         List<Role> cache = Caches.get(OaImpl.ROLE);
         List<Role> list = cache.stream()
-                .filter(o -> Objects.isNull(status) || o.getStatus().getValue() == status)
+                .filter(o -> Objects.isNull(status) || o.getStatus() == status)
                 .filter(o -> Objects.isNull(key)
-                        || (key == 1 && o.getId().toString().equals(value))
-                        || (key == 2 && o.getName().contains(value)))
+                        || (key == SearchEnum.ID && o.getId().toString().equals(value))
+                        || (key == SearchEnum.NAME && o.getName().contains(value)))
                 .collect(Collectors.toList());
 
-        int from = Math.max(page - 1, 0) * Constant.PAGE_SIZE;
+        int from = Math.max(page - 1, 0) * pageSize;
         int size = list.size();
 
         List<Role> roles = list.stream()
                 .skip(from)
-                .limit(Constant.PAGE_SIZE)
+                .limit(pageSize)
                 .collect(Collectors.toList());
 
         list.clear();

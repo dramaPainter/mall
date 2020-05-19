@@ -17,7 +17,7 @@ public interface PermissionMapper {
      *
      * @return
      */
-    @Select("SELECT * FROM oa_permission")
+    @Select("SELECT id, name, url, pid, type, sort, status FROM oa_permission")
     List<Permission> list();
 
     /**

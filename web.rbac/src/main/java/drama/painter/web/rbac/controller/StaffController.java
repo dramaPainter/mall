@@ -1,5 +1,7 @@
 package drama.painter.web.rbac.controller;
 
+import drama.painter.core.web.enums.SearchEnum;
+import drama.painter.core.web.enums.StatusEnum;
 import drama.painter.core.web.misc.Result;
 import drama.painter.core.web.misc.User;
 import drama.painter.web.rbac.model.oa.Staff;
@@ -23,7 +25,7 @@ public class StaffController {
     }
 
     @GetMapping("/oa/staff")
-    public Result<List<Staff>> staff(int page, Byte status, Byte key, String value) {
+    public Result<List<Staff>> staff(int page, StatusEnum status, SearchEnum key, String value) {
         return staff.list(page, status, key, value);
     }
 

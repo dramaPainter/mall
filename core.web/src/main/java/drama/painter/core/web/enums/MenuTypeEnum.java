@@ -22,18 +22,12 @@ public enum MenuTypeEnum implements BaseEnum {
      */
     MENU(2, "菜单");
 
-    static final List<MenuTypeEnum> MAP = Arrays.asList(MenuTypeEnum.values());
     final int value;
     final String name;
 
     MenuTypeEnum(int value, String name) {
         this.value = value;
         this.name = name;
-    }
-
-    @JsonCreator
-    public static MenuTypeEnum apply(int code) {
-        return MAP.stream().filter(o -> o.getValue() == code).findAny().orElse(null);
     }
 
     @Override

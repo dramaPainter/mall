@@ -11,7 +11,7 @@ let upsert = new Vue({
     methods: {
         loadPermission() {
             return new Promise(load => {
-                loadData("get", "/oa/permission?pageSize=15&page=1&status=-1&key=-1", {}, r => {
+                loadData("get", "/oa/permission?pageSize=9999&page=1", {}, r => {
                     r.data.filter(o => o.pid == 0).map(m => {
                         return {id: m.id + "", pid: m.pid + "", label: m.name, children: []};
                     }).forEach(e => this.permissions.push(e));
@@ -74,8 +74,8 @@ let upsert = new Vue({
         onSubmit(formName) {
             this.$refs[formName].validate((valid) => {
                 if (valid) {
-                    let copy = this.role;
-                    copy.permission = copy.permission.join(",");
+                    let copy = Object.assign({}, this.role);
+                    copy.permission = copy.permission == null ? "" : copy.permission.join(",");
                     loadData("post", "/oa/role/save", copy, r => {
                         if (r.code == 0) {
                             this.dialogEnabled = false;
@@ -111,13 +111,15 @@ let vue = new Vue({
     },
     mounted: function () {
         upsert.loadPermission().then(() => {
-            loadData("get", "/login/qualify?url=/oa/role/save", {}, r => {
+            loadData("get", "/dir/qualify?url=/oa/role/save", {}, r => {
                 this.editQualify = r.data == true;
             }, null);
-            loadData("get", "/login/qualify?url=/oa/role/remove", {}, r => {
+            loadData("get", "/dir/qualify?url=/oa/role/remove", {}, r => {
                 this.removeQualify = r.data == true;
             }, null);
         });
+
+        this.search();
     },
     methods: {
         toAdd() {
@@ -138,10 +140,8 @@ let vue = new Vue({
         },
         search() {
             this.loading = true;
-            let url = "/oa/role?page=" + this.page + "&status=" + this.status + "&key=" + this.searchType + "&value=" + encodeURIComponent(this.searchText);
+            let url = "/oa/role?pageSize=15&page=" + this.page + "&status=" + this.status + "&key=" + this.searchType + "&value=" + encodeURIComponent(this.searchText);
             loadTable(this, url);
         }
     }
 });
-
-vue.search();

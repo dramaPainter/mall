@@ -13,7 +13,7 @@ class AccessDeniedHandlerImpl implements AccessDeniedHandler {
     /**
      * 如果想要跳转页面，可以使用以下语句：
      * request.setAttribute("msg", e.getMessage());
-     * request.getRequestDispatcher("/login/error").forward(request, response);
+     * request.getRequestDispatcher("/dir/error").forward(request, response);
      */
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException e) throws IOException {

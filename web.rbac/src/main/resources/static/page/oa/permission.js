@@ -72,12 +72,14 @@ let vue = new Vue({
         removeQualify: false
     },
     mounted: function () {
-        loadData("get", "/login/qualify?url=/oa/permission/save", {}, r => {
+        loadData("get", "/dir/qualify?url=/oa/permission/save", {}, r => {
             this.editQualify = r.data == true;
         }, null);
-        loadData("get", "/login/qualify?url=/oa/permission/remove", {}, r => {
+        loadData("get", "/dir/qualify?url=/oa/permission/remove", {}, r => {
             this.removeQualify = r.data == true;
         }, null);
+
+        this.search();
     },
     methods: {
         toAdd() {
@@ -103,5 +105,3 @@ let vue = new Vue({
         }
     }
 });
-
-vue.search();

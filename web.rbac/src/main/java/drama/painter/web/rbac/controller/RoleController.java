@@ -1,5 +1,7 @@
 package drama.painter.web.rbac.controller;
 
+import drama.painter.core.web.enums.SearchEnum;
+import drama.painter.core.web.enums.StatusEnum;
 import drama.painter.core.web.misc.Result;
 import drama.painter.web.rbac.model.oa.Role;
 import drama.painter.web.rbac.service.oa.IRole;
@@ -22,8 +24,8 @@ public class RoleController {
     }
 
     @GetMapping("/oa/role")
-    public Result<List<Role>> role(int page, Byte status, Byte key, String value) {
-        return role.list(page, status, key, value);
+    public Result<List<Role>> role(int page, int pageSize, StatusEnum status, SearchEnum key, String value) {
+        return role.list(page, pageSize, status, key, value);
     }
 
     @PostMapping("/oa/role/save")
