@@ -1,11 +1,11 @@
-const vue = new Vue({
+let app = new Vue({
     el: '#app',
     data: {
         tableData: [],
         rowCount: 0,
         page: 1,
         datetime: ["", ""],
-        timespan: "0",
+        timespan: "",
         searchText: "",
         loading: false,
         pickerOptions: PICKER_OPTION

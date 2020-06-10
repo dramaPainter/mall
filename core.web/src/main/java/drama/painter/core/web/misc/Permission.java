@@ -1,7 +1,6 @@
 package drama.painter.core.web.misc;
 
 import drama.painter.core.web.enums.MenuTypeEnum;
-import drama.painter.core.web.enums.StatusEnum;
 import lombok.Data;
 
 /**
@@ -15,5 +14,4 @@ public class Permission {
     private Integer pid;
     private MenuTypeEnum type;
     private Byte sort;
-    private StatusEnum status;
 }

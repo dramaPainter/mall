@@ -1,16 +1,17 @@
 package drama.painter.core.web.ftp.upload;
 
+import drama.painter.core.web.enums.UploadEnum;
 import drama.painter.core.web.ftp.client.FtpConfig;
 import drama.painter.core.web.misc.Result;
-import drama.painter.core.web.security.PageUserDetails;
+import drama.painter.core.web.utility.Dates;
+import drama.painter.core.web.utility.Randoms;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Supplier;
 
 /**
  * @author murphy
@@ -21,17 +22,22 @@ public class Upload implements IUpload {
     private static final int ZERO = 0;
     private static final int POOL_SIZE = 5;
     private static ExecutorService POOL = null;
-
     private final FtpConfig.FtpConfigProperties ftpConfig;
+    private static final Map<UploadEnum, Supplier<String>> FUNCTION = new HashMap();
+
+    static {
+        FUNCTION.put(UploadEnum.HEAD, () -> getUrl(UploadEnum.HEAD.getName()));
+        FUNCTION.put(UploadEnum.PRODUCT, () -> getUrl(UploadEnum.PRODUCT.getName()));
+    }
 
     public Upload(FtpConfig.FtpConfigProperties ftpConfig) {
         this.ftpConfig = ftpConfig;
     }
 
     @Override
-    public Result upload(Object file, String filePath) {
+    public Result upload(Object file, UploadEnum type) {
         try {
-            return new FileUploader(ftpConfig.isLocalized(), file, ftpConfig.getBasePath(), filePath, ftpConfig.getDomain()).call();
+            return new FileUploader(ftpConfig.isLocalized(), file, ftpConfig.getBasePath(), FUNCTION.get(type).get(), ftpConfig.getDomain()).call();
         } catch (Exception e) {
             log.error("文件上传失败", e);
             return Result.toFail(e.getMessage());
@@ -39,15 +45,14 @@ public class Upload implements IUpload {
     }
 
     @Override
-    public Result uploadList(List<?> files, String filePath) {
+    public Result uploadList(List<?> files, UploadEnum type) {
         init();
 
-        int userid = ((PageUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser().getId();
         int size = files.size();
         List<FutureTask<Result>> list = new ArrayList(size);
         try {
             for (int i = 0; i < size; i++) {
-                FutureTask task = new FutureTask(new FileUploader(ftpConfig.isLocalized(), files.get(i), ftpConfig.getBasePath(), filePath, ftpConfig.getDomain()));
+                FutureTask task = new FutureTask(new FileUploader(ftpConfig.isLocalized(), files.get(i), ftpConfig.getBasePath(), FUNCTION.get(type).get(), ftpConfig.getDomain()));
                 POOL.submit(task);
                 list.add(task);
             }
@@ -73,6 +78,11 @@ public class Upload implements IUpload {
                 list.clear();
             }
         }
+    }
+
+    private static String getUrl(String url) {
+        return url.replace("{date}", Dates.toDate().substring(0, 7))
+                .replace("{uuid}", Randoms.getNonceString());
     }
 
     private void init() {

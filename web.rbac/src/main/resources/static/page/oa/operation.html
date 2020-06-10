@@ -43,7 +43,7 @@
         <el-table-column label="结果" prop="result"></el-table-column>
     </el-table>
     <!-- 分页 -->
-    <el-pagination :current-page="page" :page-size="15" :total="rowCount" @current-change="pageChanged" class="pager" layout="total, prev, pager, next" slot="paging"></el-pagination>
+    <el-pagination :current-page="page" :page-size="PAGE_SIZE" :total="rowCount" @current-change="pageChanged" class="pager" layout="total, prev, pager, next" slot="paging"></el-pagination>
 </div>
 </div>
 <script src="/js/util/core.js"></script>

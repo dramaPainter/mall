@@ -3,6 +3,7 @@ package drama.painter.web.rbac.mapper.oa;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,6 +14,14 @@ import java.util.List;
 @Repository
 public interface StaffRoleMapper {
     /**
+     * 指定员工下的角色列表
+     * @param staff
+     * @return
+     */
+    @Select("SELECT role FROM oa_staff_role WHERE staff = #{staff}")
+    List<Integer> list(int staff);
+
+    /**
      * 添加员工角色
      *
      * @param staff 员工ID
@@ -21,7 +30,7 @@ public interface StaffRoleMapper {
             "<foreach item='item' collection='role' separator=','>",
             "(#{staff}, #{item})",
             "</foreach></script>"})
-    void add(@Param("staff") int staff, @Param("role") List<String> role);
+    void add(@Param("staff") int staff, @Param("role") List<Integer> role);
 
     /**
      * 删除员工角色

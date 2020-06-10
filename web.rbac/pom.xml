@@ -33,9 +33,9 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>drama.painter.web.drama.painter.web.rbac.RbacApplication</mainClass>
+                            <mainClass>drama.painter.web.rbac.RbacApplication</mainClass>
                             <addClasspath>true</addClasspath>
-                            <classpathPrefix>spring/mall</classpathPrefix>
+                            <classpathPrefix>spring/web.rbac</classpathPrefix>
                         </manifest>
                     </archive>
                 </configuration>

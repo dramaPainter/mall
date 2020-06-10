@@ -1,5 +1,6 @@
 package drama.painter.core.web.security;
 
+import drama.painter.core.web.misc.Result;
 import drama.painter.core.web.misc.User;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
@@ -9,15 +10,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.FilterInvocation;
 
 import java.util.Collection;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static drama.painter.core.web.security.LoginSecurityConfig.AUTHORIZED_SUFFIX_ITEM;
 import static drama.painter.core.web.security.LoginSecurityConfig.AUTHORIZED_URL_PATH;
 
 class AccessAllowedHandlerImpl implements AccessDecisionManager {
-    final Consumer<User> permissionChecker;
+    final Function<User, Result<Boolean>> permissionChecker;
 
-    public AccessAllowedHandlerImpl(Consumer<User> permissionChecker) {
+    public AccessAllowedHandlerImpl(Function<User, Result<Boolean>> permissionChecker) {
         this.permissionChecker = permissionChecker;
     }
 
@@ -34,7 +35,10 @@ class AccessAllowedHandlerImpl implements AccessDecisionManager {
         if (auth.getPrincipal() instanceof String) {
             throw new InsufficientAuthenticationException("您还没有登录。");
         } else {
-            permissionChecker.accept(((PageUserDetails) auth.getPrincipal()).getUser());
+            Result<Boolean> r = permissionChecker.apply(((PageUserDetails) auth.getPrincipal()).getUser());
+            if (!Boolean.TRUE.equals(r.getData())) {
+                throw new AccessDeniedException(r.getMessage());
+            }
         }
     }
 

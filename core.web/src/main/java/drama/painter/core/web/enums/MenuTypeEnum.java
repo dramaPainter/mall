@@ -1,10 +1,5 @@
 package drama.painter.core.web.enums;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * @author murphy
  */

@@ -1,8 +1,42 @@
+let modify = new Vue({
+    el: '#modify',
+    data: {
+        pwd: {},
+        dialogEnabled: false
+    },
+    methods: {
+        toPassword(row) {
+            this.pwd = row;
+            this.dialogEnabled = true;
+        },
+        onSubmit(formName) {
+            this.$refs[formName].validate((valid) => {
+                if (valid) {
+                    this.pwd.password = this.pwd.password.length == 0 ? "" : MD5(this.pwd.password);
+                    loadData("post", "/oa/staff/password", {username: this.pwd.name, password: this.pwd.password}, r => {
+                        if (r.code == 0) {
+                            this.dialogEnabled = false;
+                            this.$message.success(r.message);
+                            app.search();
+                        } else {
+                            this.$message.error(r.message);
+                        }
+                    }, e => {
+                        this.$alert(e.message, '温馨提示');
+                    });
+                } else {
+                    return false;
+                }
+            });
+        }
+    }
+});
+
 let upsert = new Vue({
     el: '#upsert',
     data: {
         roles: [],
-        staff: {id: 0, name: '', password: '', alias: '', avatar: '', role: null, status: null},
+        staff: {},
         dialogTitle: "",
         dialogEnabled: false,
         username_disabled: false,
@@ -46,31 +80,28 @@ let upsert = new Vue({
             this.staff = {id: 0, name: '', password: '', alias: '', avatar: '', role: null, status: null};
         },
         toRemove(row) {
-            this.$confirm("帐号和其权限一并删除，确定要执行此操作？", "警告：删除后无法恢复", {type: "warning"}).then(() => {
-                loadData("post", "/oa/staff/remove", row.id, r => {
+            this.$confirm("帐号和权限一并删除，确认操作？", "警告：删除后无法恢复", {type: "warning"}).then(() => {
+                loadData("post", "/oa/staff/remove", row.name, r => {
                     if (r.code == 0) {
                         this.dialogEnabled = false;
                         this.$message.success(r.message);
-                        vue.search();
+                        app.search();
                     } else {
                         this.$message.error(r.message);
                     }
                 }, e => {
                     this.$alert(e.message, '温馨提示');
                 });
-            });
+            }).catch(() => {});
         },
         onSubmit(formName) {
             this.$refs[formName].validate((valid) => {
                 if (valid) {
-                    this.staff.password = this.staff.password.length == 0 ? "" : MD5(this.staff.password);
-                    let copy = Object.assign({}, this.staff);
-                    copy.role = copy.role == null ? "" : copy.role.join(",");
-                    loadData("post", "/oa/staff/save", copy, r => {
+                    loadData("post", "/oa/staff/save", this.staff, r => {
                         if (r.code == 0) {
                             this.dialogEnabled = false;
                             this.$message.success(r.message);
-                            vue.search();
+                            app.search();
                         } else {
                             this.$message.error(r.message);
                         }
@@ -83,57 +114,25 @@ let upsert = new Vue({
             });
         },
         beforeUpload(file) {
-            let image = new Image();
-            image.src = URL.createObjectURL(file);
-            image.onload = () => {
-                let w, h, maxSize = 300;
-                if (image.width <= maxSize && image.height <= maxSize) {
-                    w = image.width;
-                    h = image.height;
-                } else if (image.width > image.height) {
-                    w = maxSize;
-                    h = maxSize * image.height / image.width;
-                } else {
-                    h = maxSize;
-                    w = maxSize * image.width / image.height;
-                }
-
-                let imageData = this.compress(image, w, h);
-                loadData("post", "/oa/staff/avatar", imageData, r => {
-                    this.staff.avatar = r.data;
-                }, e => {
-                    this.staff.avatar = "";
-                    this.$message.success(e);
-                });
-            };
-            return false;
-        },
-        compress(image, width, height) {
-            let canvas = document.createElement("canvas");
-            let ctx = canvas.getContext("2d");
-            canvas.width = width;
-            canvas.height = height;
-            ctx.fillRect(0, 0, width, height);
-            ctx.drawImage(image, 0, 0, width, height);
-            return canvas.toDataURL("image/jpeg", 0.9);
+            return uploadSingle(this, file, ENUM.upload.HEAD.value, url => this.staff.avatar = url, true);
         }
     }
 });
 
-let vue = new Vue({
+let app = new Vue({
     el: '#app',
     data: {
         tableData: [],
         rowCount: 0,
         page: 1,
         status: "",
-        password: "",
         searchType: "",
         searchText: "",
         loading: false,
         enums: ENUM,
         editQualify: false,
-        removeQualify: false
+        removeQualify: false,
+        passwordQualify: false
     },
     mounted: function () {
         upsert.loadRoles().then(() => {
@@ -142,6 +141,9 @@ let vue = new Vue({
             }, null);
             loadData("get", "/dir/qualify?url=/oa/staff/remove", {}, r => {
                 this.removeQualify = r.data == true;
+            }, null);
+            loadData("get", "/dir/qualify?url=/oa/staff/password", {}, r => {
+                this.passwordQualify = r.data == true;
             }, null);
         });
 
@@ -157,6 +159,9 @@ let vue = new Vue({
         toRemove(row) {
             upsert.toRemove(row);
         },
+        toPassword(row) {
+            modify.toPassword(row);
+        },
         pageChanged(pageid) {
             this.page = pageid;
             this.search();
@@ -167,7 +172,10 @@ let vue = new Vue({
         search() {
             this.loading = true;
             let url = "/oa/staff?page=" + this.page + "&status=" + this.status + "&key=" + this.searchType + "&value=" + encodeURIComponent(this.searchText);
-            loadTable(this, url);
+            loadTable(this, url, () => {
+                this.tableData.forEach(o => o.role = o.role.length == 0 ? o.role : o.role.join(",").split(","));
+                this.password = "";
+            });
         }
     }
 });

@@ -6,7 +6,7 @@
     <artifactId>springcloud</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
-    <name>core - 项目入口</name>
+    <name>项目入口</name>
 
     <parent>
         <groupId>org.springframework.boot</groupId>

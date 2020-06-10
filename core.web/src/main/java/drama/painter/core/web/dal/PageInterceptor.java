@@ -56,7 +56,8 @@ class PageInterceptor implements Interceptor {
     }
 
     static void recordSql(Invocation invocation, long time) {
-        long paging = PAGING.get();
+        Long paging = PAGING.get();
+        paging = paging == null ? 0 : paging;
         PAGING.remove();
         if (log.isDebugEnabled()) {
             StatementHandler statementHandler = (StatementHandler) invocation.getTarget();
@@ -140,7 +141,11 @@ class PageInterceptor implements Interceptor {
             if (mappedStatement.getSqlCommandType() == SqlCommandType.SELECT) {
                 BoundSql boundSql = statementHandler.getBoundSql();
                 String sql = boundSql.getSql();
-                Map<?, ?> parameter = (Map<?, ?>) boundSql.getParameterObject();
+                Object mapper = boundSql.getParameterObject();
+                Map<?, ?> parameter = null;
+                if (mapper instanceof Map) {
+                    parameter = (Map<?, ?>) boundSql.getParameterObject();
+                }
                 if (parameter != null && parameter.containsKey(PAGE_OBJECT)) {
                     String countSql = "SELECT COUNT(1) FROM (" + sql + ") pagination";
                     Connection connection = (Connection) invocation.getArgs()[0];

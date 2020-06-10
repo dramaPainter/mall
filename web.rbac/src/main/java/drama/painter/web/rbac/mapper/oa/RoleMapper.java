@@ -1,10 +1,10 @@
 package drama.painter.web.rbac.mapper.oa;
 
+import drama.painter.core.web.enums.SearchEnum;
+import drama.painter.core.web.enums.StatusEnum;
+import drama.painter.core.web.misc.Page;
 import drama.painter.web.rbac.model.oa.Role;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,17 +19,26 @@ public interface RoleMapper {
      *
      * @return
      */
-    @Select({"SELECT id, name, status, " ,
-            "(SELECT GROUP_CONCAT(permission) FROM oa_role_permission sp WHERE sp.role = s.id) AS permission ",
-            "FROM oa_role s ORDER BY id DESC"})
-    List<Role> list();
+    @Select("<script>SELECT id FROM oa_role <trim prefix='WHERE' suffixOverrides='AND'>" +
+            "<if test='key != null and key.value == 1'>id = #{value}</if>" +
+            "<if test='key != null and key.value == 2'>name like CONCAT('%',#{value},'%')</if>" +
+            "</trim>ORDER BY id DESC</script>")
+    List<String> list(Page page, @Param("status") StatusEnum status, @Param("key") SearchEnum key, @Param("value") String value);
+
+    @Results({
+            @Result(property = "id", column = "id"),
+            @Result(property = "permission", column = "id", many = @Many(select = "drama.painter.web.rbac.mapper.oa.RolePermissionMapper.list"))
+    })
+    @Select("SELECT id, name FROM oa_role WHERE id = #{id}")
+    Role get(String id);
 
     /**
      * 保存数据到角色表
      *
      * @param role 添加对象
      */
-    @Insert("REPLACE INTO zero.oa_role(id, name, status) VALUES(#{id}, #{name}, #{status})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    @Insert("REPLACE INTO oa_role(id, name) VALUES(#{id}, #{name})")
     void save(Role role);
 
     /**
@@ -37,6 +46,6 @@ public interface RoleMapper {
      *
      * @param id 角色ID
      */
-    @Delete("DELETE FROM zero.oa_role WHERE id = #{id}")
+    @Delete("DELETE FROM oa_role WHERE id = #{id}")
     void remove(@Param("id") int id);
 }

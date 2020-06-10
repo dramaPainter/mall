@@ -2,20 +2,23 @@ package drama.painter.web.rbac.service.impl.oa;
 
 import drama.painter.core.web.enums.SearchEnum;
 import drama.painter.core.web.enums.StatusEnum;
+import drama.painter.core.web.misc.Page;
 import drama.painter.core.web.misc.Result;
 import drama.painter.core.web.utility.Caches;
 import drama.painter.web.rbac.mapper.oa.RoleMapper;
 import drama.painter.web.rbac.mapper.oa.RolePermissionMapper;
 import drama.painter.web.rbac.mapper.oa.StaffRoleMapper;
 import drama.painter.web.rbac.model.oa.Role;
-import drama.painter.web.rbac.service.oa.IRole;
+import drama.painter.web.rbac.service.intf.oa.IRole;
+import drama.painter.web.rbac.tool.AssertEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+
+import static drama.painter.web.rbac.service.intf.other.ICache.ROLE_REFERENCE;
 
 /**
  * @author murphy
@@ -27,54 +30,53 @@ public class RoleImpl implements IRole {
     final RolePermissionMapper rolePermissionMapper;
 
     @Autowired
-    public RoleImpl(RoleMapper roleMapper, StaffRoleMapper staffRoleMapper, RolePermissionMapper rolePermissionMapper) {
-        this.roleMapper = roleMapper;
-        this.staffRoleMapper = staffRoleMapper;
-        this.rolePermissionMapper = rolePermissionMapper;
+    public RoleImpl(RoleMapper r, StaffRoleMapper sr, RolePermissionMapper rp) {
+        this.roleMapper = r;
+        this.staffRoleMapper = sr;
+        this.rolePermissionMapper = rp;
     }
 
     @Override
     public Result<List<Role>> list(int page, int pageSize, StatusEnum status, SearchEnum key, String value) {
-        List<Role> cache = Caches.get(OaImpl.ROLE);
-        List<Role> list = cache.stream()
-                .filter(o -> Objects.isNull(status) || o.getStatus() == status)
-                .filter(o -> Objects.isNull(key)
-                        || (key == SearchEnum.ID && o.getId().toString().equals(value))
-                        || (key == SearchEnum.NAME && o.getName().contains(value)))
-                .collect(Collectors.toList());
+        Page p = new Page(page, pageSize);
+        List<String> ids = roleMapper.list(p, status, key, value);
+        List<Role> list = Caches.getHash("Role", ids, ROLE_REFERENCE, this::get);
+        return Result.toData(p.getRowCount(), list);
+    }
 
-        int from = Math.max(page - 1, 0) * pageSize;
-        int size = list.size();
-
-        List<Role> roles = list.stream()
-                .skip(from)
-                .limit(pageSize)
-                .collect(Collectors.toList());
-
-        list.clear();
-        return Result.toData(size, roles);
+    @Override
+    public Role get(String id) {
+        Role role = Caches.getHash("Role", id, Role.class);
+        if (Objects.isNull(role)) {
+            role = roleMapper.get(id);
+            if (Objects.nonNull(role)) {
+                Caches.setHash("Role", id, role, -1);
+            }
+        }
+        return role;
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Result save(Role role) {
+    public void save(Role role) {
         roleMapper.save(role);
-        rolePermissionMapper.removeByRole(role.getId());
         if (Objects.nonNull(role.getPermission()) && role.getPermission().size() > 0) {
+            rolePermissionMapper.removeByRole(role.getId());
             rolePermissionMapper.add(role.getId(), role.getPermission());
         }
 
-        OaImpl.reset();
-        return Result.SUCCESS;
+        Caches.removeHash("Role", String.valueOf(role.getId()));
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Result remove(int id) {
-        roleMapper.remove(id);
-        staffRoleMapper.removeByRole(id);
-        rolePermissionMapper.removeByRole(id);
-        OaImpl.reset();
-        return Result.SUCCESS;
+    public void remove(String id) {
+        Role role = Caches.getHash("Role", id, Role.class);
+        AssertEnum.NOT_FOUND.doAssert(role == null, "角色ID:" + id);
+        roleMapper.remove(role.getId());
+        staffRoleMapper.removeByRole(role.getId());
+        rolePermissionMapper.removeByRole(role.getId());
+        Caches.removeHash("Role", id);
+        Caches.remove("Staff");
     }
 }

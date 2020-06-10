@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8"/>
+    <title>商品管理</title>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+</head>
+<body>
+<div id="app">
+    <!-- 导航栏 -->
+    <el-breadcrumb class="pager" separator-class="el-icon-arrow-right">
+        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+        <el-breadcrumb-item>商品管理</el-breadcrumb-item>
+        <el-breadcrumb-item>商品管理</el-breadcrumb-item>
+    </el-breadcrumb>
+    <!-- 搜索功能 -->
+    <div class="navigator">
+        <el-select size="small" v-model="status" placeholder="商品状态" clearable>
+            <el-option label="上架" value="1"></el-option>
+            <el-option label="下架" value="0"></el-option>
+        </el-select>
+        <el-input class="input-with-select" placeholder="请输入内容" size="small" v-model="searchText">
+            <el-select slot="prepend" v-model="searchType" placeholder="搜索类型" clearable>
+                <el-option label="商品ID" value="1"></el-option>
+                <el-option label="商品名称" value="2"></el-option>
+                <el-option label="商品代号" value="5"></el-option>
+            </el-select>
+            <el-button @click="btnSearchClick" icon="el-icon-search" slot="append"></el-button>
+        </el-input>
+        <div class="fr">
+            <el-button @click="toAdd" icon="el-icon-plus" size="small" v-if="editQualify"></el-button>
+            <el-button @click="search" icon="el-icon-refresh" size="small"></el-button>
+        </div>
+    </div>
+    <!-- 表格 -->
+    <el-table :border="true" :data="tableData" element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" size="mini" v-loading="loading">
+        <el-table-column label="ID" prop="id"></el-table-column>
+        <el-table-column label="名称" prop="name" class-name="nowrap">
+            <template slot-scope="scope">
+                <a :href="scope.row.avatar" target="_blank"><img class="icon-avatar" :src="scope.row.avatar"/></a>
+                <label class="image-text">{{ scope.row.name }}</label>
+            </template>
+        </el-table-column>
+        <!--<el-table-column label="代号" prop="code" class-name="nowrap"></el-table-column>-->
+        <el-table-column label="分类" prop="category">
+            <template slot-scope="scope">{{ toCategory(scope.row) }}</template>
+        </el-table-column>
+        <el-table-column label="品牌" prop="brand">
+            <template slot-scope="scope">{{ toBrand(scope.row) }}</template>
+        </el-table-column>
+        <el-table-column label="已售" prop="sale"></el-table-column>
+        <el-table-column label="状态" prop="status">
+            <template slot-scope="scope">
+                <label :class="scope.row.status == enums.status.ENABLE.value ? '' : 'red'">{{ enums.product.getName(scope.row.status) }}</label>
+            </template>
+        </el-table-column>
+        <el-table-column label="热销" prop="hottest">
+            <template slot-scope="scope">{{ enums.yesno.getName(scope.row.hottest) }}</template>
+        </el-table-column>
+        <el-table-column label="新品" prop="latest">
+            <template slot-scope="scope">{{ enums.yesno.getName(scope.row.latest) }}</template>
+        </el-table-column>
+        <el-table-column label="排序" prop="sort"></el-table-column>
+        <el-table-column label="关键词" prop="keyword" class-name="nowrap"></el-table-column>
+        <el-table-column label="操作" v-if="editQualify || displayQualify">
+            <template slot-scope="scope">
+                <el-button-group>
+                    <el-button @click="toEdit(scope.row)" icon="el-icon-edit" size="mini" v-if="editQualify"></el-button>
+                    <el-button @click="toStock(scope.row)" icon="el-icon-odometer" size="mini" v-if="editQualify"></el-button>
+                    <el-button @click="toDisplay(scope.row)" size="mini" v-if="displayQualify"
+                               :icon="scope.row.status == enums.status.ENABLE.value ? 'el-icon-bottom' : 'el-icon-top'"
+                               :title="scope.row.status == enums.status.ENABLE.value ? enums.product.DISABLE.name : enums.product.ENABLE.name">
+                    </el-button>
+                </el-button-group>
+            </template>
+        </el-table-column>
+    </el-table>
+    <!-- 分页 -->
+    <el-pagination :current-page="page" :page-size="PAGE_SIZE" :total="rowCount" @current-change="pageChanged" class="pager" layout="total, prev, pager, next" slot="paging"></el-pagination>
+</div>
+<!-- 添加删除商品 -->
+<div id="upsert">
+    <el-dialog :title="dialogTitle" :visible.sync="dialogEnabled" width="640px">
+        <el-form :model="product" label-width="80px" ref="product">
+            <el-tabs type="border-card">
+                <!-- 基本信息 -->
+                <el-tab-pane label="基本信息" class="role_tag">
+                    <el-form-item :rules="[{ max: 50, message: '50字以内' }]" label="商品名称" prop="name">
+                        <el-input v-model="product.name"></el-input>
+                    </el-form-item>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="商品图片" prop="avatar">
+                                <el-upload :before-upload="beforeUpload" :show-file-list="false" action="" class="avatar-uploader">
+                                    <img :src="product.avatar" class="upload-avatar" v-if="product.avatar"/>
+                                    <i class="el-icon-plus avatar-uploader-icon" v-else></i>
+                                </el-upload>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="代号" prop="code">{{product.code}}</el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item :rules="[{ required: true, message: '必选项' }]" label="分类" prop="category">
+                                <el-select v-model="product.category">
+                                    <el-option v-for="item in categories" :key="item.id" :label="item.name" :value="item.id"></el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item :rules="[{ required: true, message: '必选项' }]" label="品牌" prop="brand">
+                                <el-select v-model="product.brand">
+                                    <el-option v-for="item in brands" :key="item.id" :label="item.name" :value="item.id"></el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item :rules="[{ required: true, message: '必填项' }, { type: 'number', message: '必须为数字' }]" required="true" label="排序" prop="sort">
+                                <el-input placeholder="数字越大越靠前" v-model.number="product.sort"></el-input>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item :rules="[{ required: true, message: '必填项' }, { type: 'number', message: '必须为数字' }]" required="true" label="已售" prop="sale">
+                                <el-input v-model.number="product.sale"></el-input>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item :rules="[{ required: true, message: '必选项' }]" label="热销" prop="hottest">
+                                <el-radio-group v-model="product.hottest">
+                                    <el-radio-button :label="1">是</el-radio-button>
+                                    <el-radio-button :label="0">否</el-radio-button>
+                                </el-radio-group>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item :rules="[{ required: true, message: '必选项'}]" label="新品" prop="latest" required="true">
+                                <el-radio-group v-model="product.latest">
+                                    <el-radio-button :label="1">是</el-radio-button>
+                                    <el-radio-button :label="0">否</el-radio-button>
+                                </el-radio-group>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-form-item label="关键字">
+                        <el-tag v-for="tag in keywords" closable @close="removeKeyword(tag)">{{ tag }}</el-tag>
+                        <el-input class="upload-avatar" v-if="newKeywordVisible" v-model.trim="newKeywordName" ref="keywordRef" size="small" @keyup.enter.native="saveKeyword" @blur="saveKeyword"></el-input>
+                        <el-button size="small" v-if="!newKeywordVisible" @click="showKeywordInput">+ 关键字</el-button>
+                    </el-form-item>
+                </el-tab-pane>
+                <!-- 商品描述 -->
+                <el-tab-pane label="商品描述">
+                    <el-form-item :rules="[{ required: true, message: '请填写商品描述' }]" label="" label-width="0px" prop="name">
+                        <el-input type="textarea" v-model="product.body"></el-input>
+                    </el-form-item>
+                </el-tab-pane>
+            </el-tabs>
+        </el-form>
+        <span class="dialog-footer" slot="footer">
+            <el-button @click="onCancel">取 消</el-button>
+            <el-button @click="onSubmit('product')" type="primary">确 定</el-button>
+        </span>
+    </el-dialog>
+</div>
+<!-- 价格库存 -->
+<div id="sku">
+    <el-dialog :title="dialogTitle" :visible.sync="dialogEnabled" @close="onCancel" width="800px">
+        <el-form :model="product" label-width="80px" ref="product">
+            <el-tabs type="border-card">
+                <el-tab-pane label="商品属性" class="role_tag">
+                    <el-tabs v-model="currentTab" editable type="card" @edit="skuTabClick" class="no-border-right">
+                        <el-tab-pane ref="tabRef" :name="index" :label="item.name" v-for="(item, index) in product.spu">
+                            <el-row>
+                                <el-col :span="12">
+                                    <el-form-item label="名称" prop="name" label-width="40px">
+                                        <el-input v-model="item.name"></el-input>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="类型" prop="impact" label-width="120px">
+                                        <el-radio-group v-model="item.impact">
+                                            <el-radio-button :label="1">SKU</el-radio-button>
+                                            <el-radio-button :label="0">SPU</el-radio-button>
+                                        </el-radio-group>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-form-item label="属性" prop="list" label-width="40px">
+                                <el-tag v-for="tag in item.list" closable @close="removeSpuItem(item, tag)">{{ tag.value }}</el-tag>
+                                <el-input class="upload-avatar" v-if="newTagVisible" v-model.trim="newTagName" ref="tagRef" size="small" @keyup.enter.native="saveTag" @blur="saveTag"></el-input>
+                                <el-button size="small" @click="showTagInput(item, index)" v-if="!newTagVisible && item.impact != null && (item.impact == ENUM.status.ENABLE.value || (item.impact == ENUM.status.DISABLE.value && item.list.length == 0))">+ 属性</el-button>
+                            </el-form-item>
+                        </el-tab-pane>
+                    </el-tabs>
+                </el-tab-pane>
+                <el-tab-pane label="价格库存">
+                    <el-table :border="true" :data="product.sku" size="mini" cell-class-name="table-ui">
+                        <el-table-column prop="id" width="35px" show-overflow-tooltip="false">
+                            <template slot="header" slot-scope="scope">
+                                <i class="el-icon-refresh pointer" @click="fill"></i>
+                            </template>
+                            <template slot-scope="scope">
+                                <i @click="stockRemove(scope.row)" class="el-icon-delete pointer"></i>
+                            </template>
+                        </el-table-column>
+                        <!--
+                        <el-table-column class-name="center" label="编号" prop="id">
+                            <template slot-scope="scope">
+                                {{scope.row.combo}}
+                            </template>
+                        </el-table-column>
+                        -->
+                        <el-table-column label-class-name="align-center" label="规格" prop="name" min-width="180px"></el-table-column>
+                        <el-table-column label-class-name="align-center" label="零售价" prop="retail">
+                            <template slot-scope="scope">
+                                <el-input v-model="scope.row.retail" class="no-border"></el-input>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label-class-name="align-center" label="市场价" prop="market">
+                            <template slot-scope="scope">
+                                <el-input v-model="scope.row.market" class="no-border"></el-input>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label-class-name="align-center" label="采购价" prop="purchase">
+                            <template slot-scope="scope">
+                                <el-input v-model="scope.row.purchase" class="no-border"></el-input>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label-class-name="align-center" label="库存" prop="stock">
+                            <template slot-scope="scope">
+                                <el-input v-model="scope.row.stock" class="no-border"></el-input>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label-class-name="align-center" label="编码" prop="sn" width="140px">
+                            <template slot-scope="scope">
+                                <el-input v-model="scope.row.sn" class="no-border"></el-input>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-tab-pane>
+            </el-tabs>
+        </el-form>
+        <span class="dialog-footer" slot="footer">
+            <el-button @click="onCancel">取 消</el-button>
+            <el-button @click="onSubmit('product')" type="primary">确 定</el-button>
+        </span>
+    </el-dialog>
+</div>
+<script src="/js/util/core.js"></script>
+<script>
+    loadScript(["product.js"]);
+</script>
+</body>
+</html>

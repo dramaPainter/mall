@@ -1,10 +1,7 @@
 package drama.painter.web.rbac.mapper.oa;
 
 import drama.painter.web.rbac.model.oa.RolePermission;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,11 +12,12 @@ import java.util.List;
 @Repository
 public interface RolePermissionMapper {
     /**
-     * 角色权限列表
-     *
+     * 指定角色下的权限列表
+     * @param role 角色ID
+     * @return
      */
-    @Select("SELECT role, permission FROM oa_role_permission")
-    List<RolePermission> list();
+    @Select("SELECT permission FROM oa_role_permission WHERE role = #{role}")
+    List<Integer> list(int role);
 
     /**
      * 添加角色权限
@@ -31,7 +29,7 @@ public interface RolePermissionMapper {
             "<foreach item='item' collection='permission' separator=','>",
             "(#{role}, #{item})",
             "</foreach></script>"})
-    void add(@Param("role") int role, @Param("permission") List<String> permission);
+    void add(@Param("role") int role, @Param("permission") List<Integer> permission);
 
     /**
      * 删除角色权限

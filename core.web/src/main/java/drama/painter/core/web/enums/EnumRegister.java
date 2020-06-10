@@ -9,9 +9,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 public class EnumRegister implements WebMvcConfigurer {
+    public static final EnumConverter ENUM_CONVERTER = new EnumConverter();
+
     @Override
     public void addFormatters(FormatterRegistry registry) {
-        registry.addConverterFactory(new EnumConverter());
+        registry.addConverterFactory(ENUM_CONVERTER);
     }
 }
 

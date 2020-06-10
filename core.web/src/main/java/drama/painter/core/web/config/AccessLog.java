@@ -1,6 +1,5 @@
 package drama.painter.core.web.config;
 
-import drama.painter.core.web.misc.User;
 import drama.painter.core.web.utility.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -52,15 +51,9 @@ public class AccessLog {
         if ("/dir/qualify".equals(url)) {
             return;
         } else if ("POST".equals(request.getMethod())) {
-            if (args.length > 0 && !log.isDebugEnabled() && args[0] instanceof User) {
-                User user = (User) args[0];
-                user.setSalt(null);
-                user.setPassword("******");
-            }
-
             returnValue = Json.toJsonString(result);
             parameter = StringUtils.arrayToCommaDelimitedString(args);
-            parameter = parameter.startsWith("data:image/jpeg;base64,") ? "Upload(上传Base64图片)" : parameter;
+            parameter = parameter.contains("data:image/jpeg;base64") ? "Upload(上传Base64图片)" : parameter;
         } else {
             parameter = request.getParameterMap().entrySet().stream()
                     .map(p -> p.getKey() + "=" + StringUtils.arrayToCommaDelimitedString(p.getValue()))

@@ -24,12 +24,12 @@ public class BasicSecurityConfig extends WebSecurityConfigurerAdapter {
         http.headers().frameOptions().sameOrigin();
         http.authorizeRequests().antMatchers("/**").authenticated().and().httpBasic().and().csrf().disable();
     }
-
+/*
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         User user = new User();
         user.setName(username);
-        user.setPassword(password);
         auth.inMemoryAuthentication().withUser(new PageUserDetails(user)).passwordEncoder(new BCryptPasswordEncoder());
     }
+ */
 }

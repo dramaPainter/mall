@@ -41,6 +41,6 @@ public class Randoms {
     }
 
     public static String getNonceString() {
-        return UUID.randomUUID().toString().replaceAll("-", "");
+        return UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
     }
 }

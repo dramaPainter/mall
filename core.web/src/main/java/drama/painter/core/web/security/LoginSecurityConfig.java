@@ -11,7 +11,7 @@ import org.springframework.security.web.authentication.rememberme.TokenBasedReme
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -28,14 +28,14 @@ public class LoginSecurityConfig extends WebSecurityConfigurerAdapter {
     public static final String USER_PARAMETER = "loginUser";
     public static final String PASSWORD_PARAMETER = "loginPassword";
 
-    public static final String[] AUTHORIZED_SUFFIX = {"/",
+    public static final String[] AUTHORIZED_SUFFIX = {
             "*.ico", "*.jpg", "*.jpeg", "*.png", "*.gif",
             "*.html", "*.htm", "*.xml", "*.js", "*.json",
             "*.css", "*.woff", "*.ttf", "*.svg",
             "*.rar", "*.zip", "*.gz", "*.ipa", "*.apk", "*.plist",
             "*.xls", "*.xlsx", "*.doc", "*.docx", "*.pdf",
             "*.mp3", "*.mp4", "*.mov", "*.ogg", "*.m3u",
-            "*.log", "*.txt"
+            "*.log", "*.txt", "/"
     };
 
     public static final List<String> AUTHORIZED_SUFFIX_ITEM = Arrays.stream(AUTHORIZED_SUFFIX)
@@ -46,7 +46,7 @@ public class LoginSecurityConfig extends WebSecurityConfigurerAdapter {
     static final PasswordAuth PASSWORD_AUTH = new PasswordAuth();
     static final String LOGIN_URL = "/dir/login";
     static final String SECRET_KEY = "Web-Security-Client-Key";
-    protected Function<String, User> userProvider;
+    protected BiFunction<String, String, User> userProvider;
 
     @Value("${spring.application.name}")
     String project;

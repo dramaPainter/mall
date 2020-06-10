@@ -5,6 +5,10 @@ package drama.painter.core.web.enums;
  */
 public enum SearchEnum implements BaseEnum {
     /**
+     * ordinal是以0开始
+     */
+    NONE(0, ""),
+    /**
      * 帐号ID
      */
     ID(1, "ID"),
@@ -19,7 +23,12 @@ public enum SearchEnum implements BaseEnum {
     /**
      * 按URL查询
      */
-    URL(4, "URL");
+    URL(4, "URL"),
+
+    /**
+     * 商品代号
+     */
+    CODE(5, "商品代号");
 
     final int value;
     final String name;

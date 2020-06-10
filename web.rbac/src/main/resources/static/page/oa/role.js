@@ -41,20 +41,16 @@ let upsert = new Vue({
             this.role = row;
             this.dialogEnabled = true;
             let keys = row.permission == null ? [] : row.permission;
-            setTimeout(() => {
+            this.$nextTick(() => {
                 this.$refs.treeviewer.setCheckedKeys(keys);
-                let topPermissions = this.permissions.filter(o => o.pid == 0);
-                if (topPermissions.length > 0) {
-                    this.$refs.treeviewer.setDefaultExpandedKeys(topPermissions.map(o => o.id));
-                }
-            }, 100);
+            });
         },
         toAdd() {
             this.dialogTitle = "添加角色";
             this.id_disabled = false;
             this.dialogEnabled = true;
             this.role = {id: 0, name: '', permission: [], status: null};
-            setTimeout(() => this.$refs.treeviewer.setCheckedKeys([]), 100);
+            this.$nextTick(() => this.$refs.treeviewer.setCheckedKeys([]));
         },
         toRemove(row) {
             this.$confirm("删除角色的同时也会删除该角色绑定的权限，确定要执行此操作？", "警告：删除后无法恢复", {type: "warning"}).then(() => {
@@ -62,25 +58,23 @@ let upsert = new Vue({
                     if (r.code == 0) {
                         this.dialogEnabled = false;
                         this.$message.success(r.message);
-                        vue.search();
+                        app.search();
                     } else {
                         this.$message.error(r.message);
                     }
                 }, e => {
                     this.$alert(e.message, '温馨提示');
                 });
-            });
+            }).catch(() => {});
         },
         onSubmit(formName) {
             this.$refs[formName].validate((valid) => {
                 if (valid) {
-                    let copy = Object.assign({}, this.role);
-                    copy.permission = copy.permission == null ? "" : copy.permission.join(",");
-                    loadData("post", "/oa/role/save", copy, r => {
+                    loadData("post", "/oa/role/save", this.role, r => {
                         if (r.code == 0) {
                             this.dialogEnabled = false;
                             this.$message.success(r.message);
-                            vue.search();
+                            app.search();
                         } else {
                             this.$message.error(r.message);
                         }
@@ -95,7 +89,7 @@ let upsert = new Vue({
     }
 });
 
-let vue = new Vue({
+let app = new Vue({
     el: '#app',
     data: {
         tableData: [],

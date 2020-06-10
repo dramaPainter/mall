@@ -26,14 +26,14 @@ let upsert = new Vue({
                     if (r.code == 0) {
                         this.dialogEnabled = false;
                         this.$message.success(r.message);
-                        vue.search();
+                        app.search();
                     } else {
                         this.$message.error(r.message);
                     }
                 }, e => {
                     this.$alert(e.message, '温馨提示');
                 });
-            });
+            }).catch(() => {});
         },
         onSubmit(formName) {
             this.$refs[formName].validate((valid) => {
@@ -42,7 +42,7 @@ let upsert = new Vue({
                         if (r.code == 0) {
                             this.dialogEnabled = false;
                             this.$message.success(r.message);
-                            vue.search();
+                            app.search();
                         } else {
                             this.$message.error(r.message);
                         }
@@ -57,7 +57,7 @@ let upsert = new Vue({
     }
 });
 
-let vue = new Vue({
+let app = new Vue({
     el: '#app',
     data: {
         tableData: [],

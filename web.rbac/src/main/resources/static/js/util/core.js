@@ -17,30 +17,25 @@ class Enum {
     }
 }
 
+const PAGE_SIZE = 15;
+
 const ENUM = {};
 ENUM.status = new Enum()
-    .add('DISABLE', '冻结', 0)
-    .add('ENABLE', '启用', 1);
+    .add('ENABLE', '启用', 1)
+    .add('DISABLE', '冻结', 0);
+ENUM.product = new Enum()
+    .add('ENABLE', '上架', 1)
+    .add('DISABLE', '下架', 0);
+ENUM.yesno = new Enum()
+    .add('YES', '是', 1)
+    .add('NO', '否', 0);
+ENUM.upload = new Enum()
+    .add('HEAD', '头像', 1)
+    .add('PRODUCT', '产品', 2);
 ENUM.menuType = new Enum()
     .add('MENU', '菜单', 2)
     .add('PAGE', '页面', 1)
     .add('ITEM', '子项', 0);
-ENUM.platform = new Enum()
-    .add('ALL', '全平台', 0)
-    .add('PLATFORM_1', '默认', 1)
-    .add('PLATFORM_2', '2平台', 2)
-    .add('PLATFORM_3', '3平台', 3)
-    .add('PLATFORM_4', '4平台', 4)
-    .add('PLATFORM_5', '5平台', 5);
-ENUM.staffType = new Enum()
-    .add('CS_OTHER', '其他客服帐号', 1)
-    .add('CS_RECHARGE', '充值客服帐号', 2)
-    .add('CS_EXCHANGE', '兑换客服帐号', 4)
-    .add('CS_MANAGER', '客服组长帐号', 8)
-    .add('PLATFORM_ONE', '单平台帐号', 16)
-    .add('PLATFORM_ALL', '全平台帐号', 32)
-    .add('PLATFORM_NATIVE', '内部帐号', 64)
-    .add('PLATFORM_ADMIN', '管理员帐号', 128);
 
 const PICKER_OPTION = {
     shortcuts: [{
@@ -89,10 +84,8 @@ function loadScript(path) {
     document.write(script);
 }
 
-function loadData(method, url, param, succeedCallback, failedCallback) {
-    failedCallback = failedCallback || function () {
-    };
-    axios.defaults.headers.post['Content-Type'] = 'application/json; charset=utf-8';
+function loadData(method, url, param, succeedCallback, failedCallback = function () {}, multipart = false) {
+    axios.defaults.headers.post['Content-Type'] = multipart ? 'multipart/form-data' : 'application/json; charset=utf-8';
     axios({method: method, url: url, data: param}).then(r => {
         let tIndex = r.request.responseURL.indexOf("?");
         let cIndex = url.indexOf("?");
@@ -112,9 +105,7 @@ function loadData(method, url, param, succeedCallback, failedCallback) {
     }).catch(r => failedCallback({code: -1, message: r}));
 }
 
-function loadTable(app, url, callback) {
-    callback = callback || function () {
-    };
+function loadTable(app, url, callback = function () {}) {
     loadData("get", url, {}, r => {
         app.tableData = r.data;
         app.rowCount = r.code;
@@ -125,4 +116,52 @@ function loadTable(app, url, callback) {
         app.loading = false;
         app.$alert(e.message, '温馨提示');
     });
+}
+
+function uploadSingle(app, file, type, callback = function () {}, compress = true) {
+    let image = new Image();
+    image.src = URL.createObjectURL(file);
+    image.onload = () => {
+        let w, h, maxSize = 300;
+        if (image.width <= maxSize && image.height <= maxSize) {
+            w = image.width;
+            h = image.height;
+        } else if (image.width > image.height) {
+            w = maxSize;
+            h = maxSize * image.height / image.width;
+        } else {
+            h = maxSize;
+            w = maxSize * image.width / image.height;
+        }
+
+        let formData = new FormData();
+        if (compress) {
+            let imageData = compressImage(image, w, h);
+            formData.append('image', imageData);
+            formData.append('type', type);
+        } else {
+            formData.append('file', file);
+            formData.append('type', type);
+        }
+        loadData("post", "/upload/single", formData, r => {
+            if (r.code == 0) {
+                callback(r.data);
+            } else {
+                app.$alert(r.message, '温馨提示');
+            }
+        }, e => {
+            app.$alert(e.message, '温馨提示');
+        }, true);
+    };
+    return false;
+}
+
+function compressImage(image, width, height) {
+    let canvas = document.createElement("canvas");
+    let ctx = canvas.getContext("2d");
+    canvas.width = width;
+    canvas.height = height;
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(image, 0, 0, width, height);
+    return canvas.toDataURL("image/jpeg", 0.9);
 }

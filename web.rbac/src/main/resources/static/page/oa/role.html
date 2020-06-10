@@ -34,11 +34,6 @@
     <el-table :border="true" :data="tableData" element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" size="mini" v-loading="loading">
         <el-table-column label="角色ID" prop="id"></el-table-column>
         <el-table-column label="角色名称" prop="name"></el-table-column>
-        <el-table-column label="状态" prop="status">
-            <template slot-scope="scope">
-                <label :class="scope.row.status == enums.status.ENABLE.value ? '' : 'red'">{{ enums.status.getName(scope.row.status) }}</label>
-            </template>
-        </el-table-column>
         <el-table-column label="操作" v-if="editQualify || removeQualify">
             <template slot-scope="scope">
                 <el-button-group>
@@ -49,25 +44,20 @@
         </el-table-column>
     </el-table>
     <!-- 分页 -->
-    <el-pagination :current-page="page" :page-size="15" :total="rowCount" @current-change="pageChanged" class="pager" layout="total, prev, pager, next" slot="paging"></el-pagination>
+    <el-pagination :current-page="page" :page-size="PAGE_SIZE" :total="rowCount" @current-change="pageChanged" class="pager" layout="total, prev, pager, next" slot="paging"></el-pagination>
 </div>
 <!-- 添加删除角色 -->
 <div id="upsert">
     <el-dialog :title="dialogTitle" :visible.sync="dialogEnabled" width="480px">
         <el-form :model="role" label-width="80px" ref="role">
-            <el-form-item :rules="[{ required: true, message: '请填写角色ID', trigger: 'blur' }]" label="角色ID" prop="id">
+            <el-form-item :rules="[{ required: true, message: '请填写角色ID' }]" label="角色ID" prop="id">
                 <el-input v-model="role.id" :disabled="id_disabled"></el-input>
             </el-form-item>
-            <el-form-item :rules="[{ required: true, message: '请填写角色名称', trigger: 'blur' }]" label="角色名称" prop="name">
+            <el-form-item :rules="[{ required: true, message: '请填写角色名称' }]" label="角色名称" prop="name">
                 <el-input v-model="role.name"></el-input>
             </el-form-item>
             <el-form-item label="权限列表">
                     <el-tree :data="permissions" node-key="id" ref="treeviewer" default-expanded-keys="[100002]" show-checkbox @check="onCheck"></el-tree>
-            </el-form-item>
-            <el-form-item :rules="[{ required: true, message: '请选择状态', trigger: 'change' }]" label="状态" prop="status">
-                <el-radio-group v-model="role.status">
-                    <el-radio-button :key="item.value" :label="item.value" v-for="item in enums.status">{{item.name}}</el-radio-button>
-                </el-radio-group>
             </el-form-item>
         </el-form>
         <span class="dialog-footer" slot="footer">

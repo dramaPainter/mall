@@ -1,9 +1,10 @@
 package drama.painter.core.web.security;
 
+import drama.painter.core.web.misc.Result;
 import drama.painter.core.web.misc.User;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * 使用页面鉴权模式
@@ -11,7 +12,7 @@ import java.util.function.Consumer;
  * @author murphy
  */
 public class PageSecurityConfig extends LoginSecurityConfig {
-    protected Consumer<User> permissionChecker;
+    protected Function<User, Result<Boolean>> permissionChecker;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
