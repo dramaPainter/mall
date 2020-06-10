@@ -74,11 +74,11 @@ const PICKER_OPTION = {
 
 function loadScript(path) {
     let script = `
-        <link href="/js/vue/element/element-ui.css" rel="stylesheet"/>
+        <link href="/js/vue/element/element-ui.min.css" rel="stylesheet"/>
         <link href="/css/core.css" rel="stylesheet"/>
-        <script src="/js/vue/element/vue.js"></script>
-        <script src="/js/vue/element/axios.js"></script>
-        <script src="/js/vue/element/element-ui.js"></script>
+        <script src="/js/vue/element/vue.min.js"></script>
+        <script src="/js/vue/element/axios.min.js"></script>
+        <script src="/js/vue/element/element-ui.min.js"></script>
     `;
     path.forEach(o => script += `<script src="${o}"></script>`);
     document.write(script);

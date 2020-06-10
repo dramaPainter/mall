@@ -28,6 +28,44 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>com.samaxes.maven</groupId>
+                <artifactId>minify-maven-plugin</artifactId>
+                <version>1.7.6</version>
+                <executions>
+                    <execution>
+                        <id>JS混淆</id>
+                        <configuration>
+                            <charset>UTF-8</charset>
+                            <webappSourceDir>${project.build.directory}/classes</webappSourceDir>
+                            <cssSourceDir>./static/css</cssSourceDir>
+                            <jsSourceDir>./static/</jsSourceDir>
+                            <cssIncludes>
+                                <cssInclude>**/*.css</cssInclude>
+                            </cssIncludes>
+                            <jsIncludes>
+                                <jsInclude>**/*.js</jsInclude>
+                            </jsIncludes>
+                            <jsExcludes>
+                                <jsExclude>**/*.min.js</jsExclude>
+                                <jsExclude>**/tinymce/**</jsExclude>
+                            </jsExcludes>
+
+                            <!-- 使用closure压缩时的压缩级别，默认值为SIMPLE_OPTIMIZATIONS。可选值： -->
+                            <!-- WHITESPACE_ONLY：只压缩空格和转换一些特殊符号 -->
+                            <!-- SIMPLE_OPTIMIZATIONS：简单的压缩 -->
+                            <!-- ADVANCED_OPTIMIZATIONS：高级压缩，此压缩方式下可能会将引用的第3方框架的方法名称修改，导致js报错；慎用。 -->
+                            <closureCompilationLevel>SIMPLE_OPTIMIZATIONS</closureCompilationLevel>
+                            <jsEngine>CLOSURE</jsEngine><!-- CLOSURE 或者 YUI -->
+                            <skipMerge>true</skipMerge><!-- 不合并js/css -->
+                            <nosuffix>true</nosuffix><!-- 压缩后的文件不.js前添加.min前缀 -->
+                        </configuration>
+                        <goals>
+                            <goal>minify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
