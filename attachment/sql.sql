@@ -9,7 +9,8 @@ create table oa_permission(
 
 create table oa_role (
     id     int auto_increment comment '角色ID' primary key,
-    name   varchar(30) not null comment '角色名称'
+    name   varchar(30) not null comment '角色名称',
+    remark varchar(30) not null comment '备注'
 ) comment '角色表';
 
 create table oa_role_permission (
@@ -70,12 +71,9 @@ INSERT INTO oa_permission (id, name, url, pid, type, sort) VALUES (100031, '查�
 INSERT INTO oa_permission (id, name, url, pid, type, sort) VALUES (100032, '设置商品品牌', '/eb/brand/save', 100030, 0, 2);
 INSERT INTO oa_permission (id, name, url, pid, type, sort) VALUES (100033, '删除商品品牌', '/eb/brand/remove', 100030, 0, 3);
 
-INSERT INTO oa_role (id, name) VALUES (1, '超管');
-INSERT INTO oa_role (id, name) VALUES (2, '运维');
-INSERT INTO oa_role (id, name) VALUES (3, '财务');
-INSERT INTO oa_role (id, name) VALUES (4, '运营');
-INSERT INTO oa_role (id, name) VALUES (5, '客服');
-INSERT INTO oa_role (id, name) VALUES (6, '行政');
+INSERT INTO oa_role (id, name, remark) VALUES (1, '超管', '');
+INSERT INTO oa_role (id, name, remark) VALUES (3, '财务', '');
+INSERT INTO oa_role (id, name, remark) VALUES (2, '客服', '');
 
 INSERT INTO oa_staff (id, name, alias, status, salt, password, avatar) VALUES (1, 'admin', '管理员', true, 'dWwlO4iI', '5C2791C78DCB6C0FDFAA962002ABB075', '');
 INSERT INTO oa_role_permission (role, permission) SELECT 1, id FROM oa_permission
@@ -127,3 +125,11 @@ create table eb_product_sku_value (
     value   varchar(30) not null comment '属性值',
     index IDX_NAME_ID (name_id)
 ) comment '产品SKU属性值';
+
+create table eb_image (
+    id    int auto_increment primary key comment '自增列',
+    type  tinyint      not null comment '所属类型',
+    value int          not null comment '类型对应ID',
+    url   varchar(100) not null comment '图片地址',
+    index IDX_VALUE (value)
+) comment '产品集合图片库'

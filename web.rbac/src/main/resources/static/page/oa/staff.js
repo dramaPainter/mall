@@ -62,11 +62,8 @@
             },
             toName(id) {
                 let find = this.roles.filter(o => o.id == id);
-                return find.length == 0 ? "未知角色" : find[0].name;
-            },
-            toColor(id) {
-                let role = this.roles.filter(o => o.id == id);
-                return this.colors[role.length == 0 ? 0 : this.roles.indexOf(role[0]) % 5];
+                let name = find.length == 0 ? "未知角色" : find[0].name;
+                return name;
             },
             toEdit(row) {
                 this.dialogTitle = "修改帐号";
@@ -162,6 +159,9 @@
             },
             toPassword(row) {
                 modify.toPassword(row);
+            },
+            toName(id) {
+               return upsert.toName(id);
             },
             pageChanged(pageid) {
                 this.page = pageid;

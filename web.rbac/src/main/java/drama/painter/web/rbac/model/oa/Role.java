@@ -11,5 +11,6 @@ import java.util.List;
 public class Role {
     Integer id;
     String name;
+    String remark;
     List<Integer> permission;
 }

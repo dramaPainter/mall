@@ -64,14 +64,8 @@ public interface StaffMapper {
      *
      * @param staff 更新对象
      */
-    @Update({"<script>UPDATE oa_staff <trim prefix='UPDATE' suffixOverrides=','>",
-            "<if test='name != null'>name = #{name}</if>",
-            "<if test='alias != null'>alias = #{alias}</if>",
-            "<if test='status != null'>status = #{status}</if>",
-            "<if test='avatar != null'>avatar = #{avatar}</if>",
-            "</trim><where>id = #{id}</where></script>"})
+    @Update("UPDATE oa_staff SET name = #{name}, alias = #{alias}, status = #{status}, avatar = #{avatar} WHERE id = #{id}")
     void update(User staff);
-
 
     /**
      * 更新数据到员工表

@@ -1,4 +1,4 @@
-(function () {
+
     let sku = new Vue({
         el: '#sku',
         data: {
@@ -21,7 +21,6 @@
                 });
                 this.dialogTitle = "商品库存 - " + this.product.name;
                 this.dialogEnabled = true;
-                this.keywords = [];
             },
             stockRemove(row) {
                 this.$confirm("确定要删除 [" + row.name + "] ？", "温馨提示", {type: 'warning'}).then(() =>
@@ -118,6 +117,9 @@
             categories: [],
             keywords: [],
             product: {},
+            uploadUrl: '',
+            uploadVisible: false,
+            editorInit: false,
             dialogTitle: "",
             dialogEnabled: false,
             newKeywordVisible: false,
@@ -159,6 +161,12 @@
                 this.dialogEnabled = true;
                 this.product = row;
                 this.keywords = row.keyword.length == 0 ? [] : row.keyword.split(",");
+                this.$nextTick(() => {
+                    if (!this.editorInit) {
+                        tinymce.init({selector: 'textarea', height: 400, language: 'zh_CN'});
+                        this.editorInit = true;
+                    }
+                })
             },
             toAdd() {
                 this.dialogTitle = "添加商品";
@@ -205,6 +213,16 @@
                         return false;
                     }
                 });
+            },
+            uploadRemove(file, fileList) {
+                console.log(file, fileList);
+            },
+            uploadPreview(file) {
+                this.uploadUrl = file.url;
+                this.uploadVisible = true;
+            },
+            uploadAvatar(file) {
+
             },
             beforeUpload(file) {
                 return uploadSingle(this, file, ENUM.upload.PRODUCT.value, url => this.product.avatar = url, true);
@@ -286,8 +304,9 @@
                 loadTable(this, url, () => this.tableData.forEach(o => {
                     o.brand = o.brand + "";
                     o.category = o.category + "";
+                    upsert.product = o;
                 }));
             }
         }
     });
-})();
+

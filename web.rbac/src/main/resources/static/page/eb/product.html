@@ -49,20 +49,20 @@
             <template slot-scope="scope">{{ toBrand(scope.row) }}</template>
         </el-table-column>
         <el-table-column label="已售" prop="sale"></el-table-column>
-        <el-table-column label="状态" prop="status">
+        <el-table-column label="状态" prop="status" min-width="50px">
             <template slot-scope="scope">
                 <label :class="scope.row.status == enums.status.ENABLE.value ? '' : 'red'">{{ enums.product.getName(scope.row.status) }}</label>
             </template>
         </el-table-column>
-        <el-table-column label="热销" prop="hottest">
+        <el-table-column label="热销" prop="hottest" min-width="50px">
             <template slot-scope="scope">{{ enums.yesno.getName(scope.row.hottest) }}</template>
         </el-table-column>
-        <el-table-column label="新品" prop="latest">
+        <el-table-column label="新品" prop="latest" min-width="50px">
             <template slot-scope="scope">{{ enums.yesno.getName(scope.row.latest) }}</template>
         </el-table-column>
-        <el-table-column label="排序" prop="sort"></el-table-column>
+        <el-table-column label="排序" prop="sort" min-width="50px"></el-table-column>
         <el-table-column label="关键词" prop="keyword" class-name="nowrap"></el-table-column>
-        <el-table-column label="操作" v-if="editQualify || displayQualify">
+        <el-table-column label="操作" min-width="160px" v-if="editQualify || displayQualify">
             <template slot-scope="scope">
                 <el-button-group>
                     <el-button @click="toEdit(scope.row)" icon="el-icon-edit" size="mini" v-if="editQualify"></el-button>
@@ -81,26 +81,14 @@
 <!-- 添加删除商品 -->
 <div id="upsert">
     <el-dialog :title="dialogTitle" :visible.sync="dialogEnabled" width="640px">
-        <el-form :model="product" label-width="80px" ref="product">
+        <el-form :model="product" label-width="80px" ref="product" style="position: relative">
+            <label class="product-code">{{product.code}}</label>
             <el-tabs type="border-card">
                 <!-- 基本信息 -->
                 <el-tab-pane label="基本信息" class="role_tag">
                     <el-form-item :rules="[{ max: 50, message: '50字以内' }]" label="商品名称" prop="name">
                         <el-input v-model="product.name"></el-input>
                     </el-form-item>
-                    <el-row>
-                        <el-col :span="12">
-                            <el-form-item label="商品图片" prop="avatar">
-                                <el-upload :before-upload="beforeUpload" :show-file-list="false" action="" class="avatar-uploader">
-                                    <img :src="product.avatar" class="upload-avatar" v-if="product.avatar"/>
-                                    <i class="el-icon-plus avatar-uploader-icon" v-else></i>
-                                </el-upload>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="12">
-                            <el-form-item label="代号" prop="code">{{product.code}}</el-form-item>
-                        </el-col>
-                    </el-row>
                     <el-row>
                         <el-col :span="12">
                             <el-form-item :rules="[{ required: true, message: '必选项' }]" label="分类" prop="category">
@@ -152,11 +140,27 @@
                         <el-input class="upload-avatar" v-if="newKeywordVisible" v-model.trim="newKeywordName" ref="keywordRef" size="small" @keyup.enter.native="saveKeyword" @blur="saveKeyword"></el-input>
                         <el-button size="small" v-if="!newKeywordVisible" @click="showKeywordInput">+ 关键字</el-button>
                     </el-form-item>
+                    <el-row>
+                        <el-form-item label="图片轮播">
+                            <el-upload action="/upload/multiple" :auto-upload="false" multiple="true" list-type="picture-card" :on-preview="uploadPreview" accept="image/**" :on-remove="uploadRemove" :file-list="product.image">
+                                <i slot="default" class="el-icon-plus"></i>
+                                <div slot="file" slot-scope="{file}" class="upload-multiple">
+                                    <span class="helper"></span>
+                                    <img class="el-upload-list__item-thumbnail" :src="file.url" alt="">
+                                    <span class="el-upload-list__item-actions">
+                                        <span v-if="!uploadVisible" class="el-upload-list__item-delete" @click="uploadAvatar(file)"><i class="el-icon-s-home" title="设为封面"></i></span>
+                                        <span class="el-upload-list__item-preview" @click="uploadPreview(file)"><i class="el-icon-zoom-in" title="查看原图"></i></span>
+                                        <span v-if="!uploadVisible" class="el-upload-list__item-delete" @click="uploadRemove(file)"><i class="el-icon-delete" title="删除图片"></i></span>
+                                    </span>
+                                </div>
+                            </el-upload>
+                        </el-form-item>
+                    </el-row>
                 </el-tab-pane>
                 <!-- 商品描述 -->
                 <el-tab-pane label="商品描述">
                     <el-form-item :rules="[{ required: true, message: '请填写商品描述' }]" label="" label-width="0px" prop="name">
-                        <el-input type="textarea" v-model="product.body"></el-input>
+                        <textarea name="content" v-model="product.body"></textarea>
                     </el-form-item>
                 </el-tab-pane>
             </el-tabs>
@@ -166,6 +170,7 @@
             <el-button @click="onSubmit('product')" type="primary">确 定</el-button>
         </span>
     </el-dialog>
+    <el-dialog :visible.sync="uploadVisible"><img width="100%" :src="uploadUrl" alt=""></el-dialog>
 </div>
 <!-- 价格库存 -->
 <div id="sku">
@@ -252,6 +257,7 @@
     </el-dialog>
 </div>
 <script src="/js/util/core.js"></script>
+<script src="/js/tinymce/tinymce.min.js"></script>
 <script>
     loadScript(["product.js"]);
 </script>

@@ -6,5 +6,5 @@ import drama.painter.web.rbac.model.eb.Product;
  * @author murphy
  */
 public interface IProductSku {
-    void saveSku(Product p);
+    void saveSku(Product p, Product origin);
 }

@@ -29,7 +29,7 @@ public interface RoleMapper {
             @Result(property = "id", column = "id"),
             @Result(property = "permission", column = "id", many = @Many(select = "drama.painter.web.rbac.mapper.oa.RolePermissionMapper.list"))
     })
-    @Select("SELECT id, name FROM oa_role WHERE id = #{id}")
+    @Select("SELECT id, name, remark FROM oa_role WHERE id = #{id}")
     Role get(String id);
 
     /**
@@ -37,8 +37,8 @@ public interface RoleMapper {
      *
      * @param role 添加对象
      */
-    @Options(useGeneratedKeys = true, keyProperty = "id")
-    @Insert("REPLACE INTO oa_role(id, name) VALUES(#{id}, #{name})")
+    @Insert("INSERT INTO oa_role(id, name, remark) VALUES(#{id}, #{name}, #{remark}) " +
+            "ON DUPLICATE KEY UPDATE name = VALUES(name), remark = VALUES(remark)")
     void save(Role role);
 
     /**

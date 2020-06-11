@@ -34,6 +34,7 @@
     <el-table :border="true" :data="tableData" element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" size="mini" v-loading="loading">
         <el-table-column label="角色ID" prop="id"></el-table-column>
         <el-table-column label="角色名称" prop="name"></el-table-column>
+        <el-table-column label="备注" prop="remark"></el-table-column>
         <el-table-column label="操作" v-if="editQualify || removeQualify">
             <template slot-scope="scope">
                 <el-button-group>
@@ -55,6 +56,9 @@
             </el-form-item>
             <el-form-item :rules="[{ required: true, message: '请填写角色名称' }]" label="角色名称" prop="name">
                 <el-input v-model="role.name"></el-input>
+            </el-form-item>
+            <el-form-item label="备注" prop="remark">
+                <el-input v-model="role.remark"></el-input>
             </el-form-item>
             <el-form-item label="权限列表">
                     <el-tree :data="permissions" node-key="id" ref="treeviewer" default-expanded-keys="[100002]" show-checkbox @check="onCheck"></el-tree>

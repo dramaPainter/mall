@@ -35,7 +35,8 @@ public interface ProductMapper {
     @Results({
             @Result(property = "id", column = "id"),
             @Result(property = "sku", column = "id", many = @Many(select = "drama.painter.web.rbac.mapper.eb.ProductSkuMapper.list")),
-            @Result(property = "spu", column = "id", many = @Many(select = "drama.painter.web.rbac.mapper.eb.ProductSkuNameMapper.list"))
+            @Result(property = "spu", column = "id", many = @Many(select = "drama.painter.web.rbac.mapper.eb.ProductSkuNameMapper.list")),
+            @Result(property = "image", column = "id", many = @Many(select = "drama.painter.web.rbac.mapper.eb.ProductImageMapper.list"))
     })
     @Select("SELECT id,name,code,category,brand,sort,status,hottest,latest,sale,keyword,avatar,body FROM eb_product WHERE code = #{code}")
     Product get(String code);

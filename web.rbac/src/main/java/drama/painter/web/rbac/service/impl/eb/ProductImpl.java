@@ -69,7 +69,10 @@ public class ProductImpl implements IProduct {
 
     @Override
     public void saveSku(Product p) {
-        sku.saveSku(p);
+        AssertEnum.NOT_FOUND.doAssert(p.getName() == null, "参数:商品名");
+        Product origin = get(p.getCode());
+        AssertEnum.NOT_FOUND.doAssert(origin == null, "原始:商品名");
+        sku.saveSku(p, origin);
     }
 
     @Transactional(rollbackFor = Exception.class)

@@ -33,21 +33,13 @@ public class ProductSkuImpl implements IProductSku {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void saveSku(Product p) {
-        AssertEnum.NOT_FOUND.doAssert(p.getName() == null, "参数:商品名");
-
-        if (Objects.nonNull(p.getSku()) && p.getSku().size() > 0) {
+    public void saveSku(Product p, Product origin) {
+        if (Objects.nonNull(p.getSku()) && !p.getSku().isEmpty()) {
             skuMapper.remove(p.getId());
             skuMapper.save(p.getSku());
         }
 
-        if (Objects.nonNull(p.getSku()) && p.getSku().size() > 0) {
-            List<ProductSkuName> updates = p.getSpu().stream().filter(o -> o.getId() != null).collect(Collectors.toList());
-            if (!updates.isEmpty()) {
-                skuNameMapper.removeNot(p.getId(), updates);
-                skuNameMapper.update(updates);
-            }
-
+        if (Objects.nonNull(p.getSku()) && !p.getSku().isEmpty()) {
             List<ProductSkuName> adds = p.getSpu().stream().filter(o -> o.getId() == null).collect(Collectors.toList());
             if (!adds.isEmpty()) {
                 skuNameMapper.add(adds);
@@ -56,14 +48,19 @@ public class ProductSkuImpl implements IProductSku {
             p.getSpu().stream().forEach(o -> o.getList().stream()
                     .filter(t -> Objects.isNull(t.getNameId()))
                     .forEach(n -> n.setNameId(o.getId())));
+
             List<ProductSkuValue> list = p.getSpu().stream()
                     .map(ProductSkuName::getList)
                     .flatMap(u -> u.stream())
                     .collect(Collectors.toList());
 
-            if (list.size() > 0) {
-                skuValueMapper.removeNot(list);
-                skuValueMapper.save(list);
+            skuValueMapper.removeNot(origin.getSpu(), list);
+            skuNameMapper.removeNot(p.getId(), p.getSpu());
+            skuValueMapper.save(list);
+
+            List<ProductSkuName> updates = p.getSpu().stream().filter(o -> o.getId() != null).collect(Collectors.toList());
+            if (!updates.isEmpty()) {
+                skuNameMapper.update(updates);
             }
 
             updates.clear();

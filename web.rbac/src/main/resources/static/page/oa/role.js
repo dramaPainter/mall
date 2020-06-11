@@ -50,7 +50,7 @@
                 this.dialogTitle = "添加角色";
                 this.id_disabled = false;
                 this.dialogEnabled = true;
-                this.role = {id: 0, name: '', permission: [], status: null};
+                this.role = {id: 0, name: '', remark: '', permission: [], status: null};
                 this.$nextTick(() => this.$refs.treeviewer.setCheckedKeys([]));
             },
             toRemove(row) {

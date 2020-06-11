@@ -43,7 +43,7 @@
         <el-table-column label="昵称" prop="alias"></el-table-column>
         <el-table-column label="角色" prop="role" class-name="role_tag">
             <template slot-scope="scope">
-                <el-tag size="medium" v-for="item in scope.row.role" type="danger">{{ upsert.toName(item) }}</el-tag>
+                <el-tag size="medium" v-for="item in scope.row.role" type="danger">{{ toName(item) }}</el-tag>
             </template>
         </el-table-column>
         <el-table-column label="状态" prop="status">
@@ -55,8 +55,8 @@
             <template slot-scope="scope">
                 <el-button-group>
                     <el-button @click="toEdit(scope.row)" icon="el-icon-edit" size="mini" v-if="editQualify"></el-button>
-                    <el-button @click="toRemove(scope.row)" icon="el-icon-delete" size="mini" v-if="removeQualify"></el-button>
                     <el-button @click="toPassword(scope.row)" icon="el-icon-setting" size="mini" v-if="passwordQualify"></el-button>
+                    <el-button @click="toRemove(scope.row)" icon="el-icon-delete" size="mini" v-if="removeQualify"></el-button>
                 </el-button-group>
             </template>
         </el-table-column>
@@ -115,6 +115,6 @@
     </el-dialog>
 </div>
 <script src="/js/util/core.js"></script>
-<script>loadScript(["/js/util/md5.js", "staff.js"])</script>
+<script>loadScript(["/js/util/md5.min.js", "staff.js"])</script>
 </body>
 </html>
