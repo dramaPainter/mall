@@ -16,7 +16,7 @@
     <!-- 搜索功能 -->
     <div class="navigator">
         <el-select size="small" v-model="status" placeholder="角色状态" clearable>
-            <el-option :key="item.value" :label="item.name" :value="item.value" v-for="item in enums.status"></el-option>
+            <el-option :key="item.value" :label="item.name" :value="item.value" v-for="item in ENUM.status"></el-option>
         </el-select>
         <el-input class="input-with-select" placeholder="请输入内容" size="small" v-model="searchText">
             <el-select slot="prepend" v-model="searchType" placeholder="搜索类型" clearable>

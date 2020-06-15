@@ -10,14 +10,19 @@ public enum UploadEnum implements BaseEnum {
     NONE(0, ""),
 
     /**
-     * 员工头像
+     * 首页轮播图
      */
-    HEAD(1, "/upload/head/{date}/{uuid}.jpg"),
+    INDEX_CAROUSEL(1, "/upload/index/{uuid}.jpg"),
 
     /**
-     * 商品图列表
+     * 商品轮播图
      */
-    PRODUCT(2, "/upload/product/{date}/{uuid}.jpg");
+    PRODUCT_CAROUSEL(2, "/upload/product/{date}/{uuid}.jpg"),
+
+    /**
+     * 员工头像
+     */
+    STAFF_HEAD(3, "/upload/head/{date}/{uuid}.jpg");
 
     final int value;
     final String name;

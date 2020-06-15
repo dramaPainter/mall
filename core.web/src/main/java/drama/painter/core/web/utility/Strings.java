@@ -5,16 +5,22 @@ import org.springframework.util.StringUtils;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.regex.Pattern;
 
 /**
  * @author murphy
  */
 public class Strings {
+    private static Pattern INTEGER = Pattern.compile("^\\d+$");
     private static final Object LOCK = new Object[0];
     private static int INCREMENT = 0;
 
     public static String reset(String val) {
         return StringUtils.isEmpty(val) ? "" : val.trim();
+    }
+
+    public static Integer parseInteger(String value) {
+        return INTEGER.matcher(value).matches() ? Integer.parseInt(value) : null;
     }
 
     public static long getOrderId(String prefix) {

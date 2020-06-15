@@ -1,4 +1,4 @@
-(function () {
+!function () {
     let upsert = new Vue({
         el: '#upsert',
         data: {
@@ -6,8 +6,7 @@
             role: {},
             dialogTitle: "",
             dialogEnabled: false,
-            id_disabled: false,
-            enums: ENUM
+            id_disabled: false
         },
         methods: {
             loadPermission() {
@@ -100,7 +99,6 @@
             searchType: "",
             searchText: "",
             loading: false,
-            enums: ENUM,
             editQualify: false,
             removeQualify: false
         },
@@ -140,4 +138,4 @@
             }
         }
     });
-})();
+}();

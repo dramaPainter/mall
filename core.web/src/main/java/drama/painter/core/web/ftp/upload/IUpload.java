@@ -22,7 +22,7 @@ public interface IUpload {
      * 上传单个文件
      *
      * @param files 可以是BASE64字符串的List，也可以是MultipartFile的List
-     * @param type  上传相对路径，可使用变量
+     * @param type  上传类型
      * @return
      */
     Result uploadList(List<?> files, UploadEnum type);

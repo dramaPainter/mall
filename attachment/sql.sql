@@ -92,7 +92,7 @@ create table eb_product (
     sale     int           not null comment '已售数量',
     keyword  varchar(50)   not null comment '关键词',
     avatar   varchar(100)  not null comment '图片(480x480)',
-    body     varchar(1000) not null comment '产品详细描述',
+    body     varchar(3000) not null comment '产品详细描述',
     unique index IDX_CODE (code),
     index IDX_CATE (category),
     index IDX_BRAND (brand),
@@ -130,6 +130,8 @@ create table eb_image (
     id    int auto_increment primary key comment '自增列',
     type  tinyint      not null comment '所属类型',
     value int          not null comment '类型对应ID',
+    name  varchar(50)  not null comment '标题',
     url   varchar(100) not null comment '图片地址',
-    index IDX_VALUE (value)
+    index IDX_VALUE (value),
+    index IDX_TYPE (type)
 ) comment '产品集合图片库'

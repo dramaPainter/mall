@@ -16,7 +16,7 @@
     <!-- 搜索功能 -->
     <div class="navigator">
         <el-select size="small" v-model="status" placeholder="权限状态" clearable>
-            <el-option :key="item.value" :label="item.name" :value="item.value" v-for="item in enums.status"></el-option>
+            <el-option :key="item.value" :label="item.name" :value="item.value" v-for="item in ENUM.status"></el-option>
         </el-select>
         <el-input class="input-with-select" placeholder="请输入内容" size="small" v-model="searchText">
             <el-select slot="prepend" v-model="searchType" placeholder="搜索类型" clearable>
@@ -38,7 +38,7 @@
         <el-table-column label="权限URL" prop="url"></el-table-column>
         <el-table-column label="上级ID" prop="pid"></el-table-column>
         <el-table-column label="类型" prop="type">
-            <template slot-scope="scope">{{ enums.menuType.getName(scope.row.type) }}</template>
+            <template slot-scope="scope">{{ ENUM.menuType.getName(scope.row.type) }}</template>
         </el-table-column>
         <el-table-column label="排序" prop="sort"></el-table-column>
         <el-table-column label="操作" v-if="editQualify || removeQualify">
@@ -71,7 +71,7 @@
             </el-form-item>
             <el-form-item :rules="[{ required: true, message: '请选择权限类型', trigger: 'change' }]" label="权限类型" prop="type">
                 <el-select placeholder="请选择权限类型" v-model="permission.type">
-                    <el-option :key="item.value" :label="item.name" :value="item.value" v-for="item in enums.menuType"></el-option>
+                    <el-option :key="item.value" :label="item.name" :value="item.value" v-for="item in ENUM.menuType"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item :rules="[{ required: true, message: '请填写排序值' }]" label="排序" prop="sort">

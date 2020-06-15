@@ -1,11 +1,10 @@
 package drama.painter.web.rbac.controller.other;
 
 import drama.painter.core.web.enums.UploadEnum;
-import drama.painter.core.web.ftp.upload.IUpload;
 import drama.painter.core.web.misc.Result;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import drama.painter.web.rbac.model.com.Image;
+import drama.painter.web.rbac.service.intf.com.IImage;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -15,19 +14,30 @@ import java.util.List;
  */
 @RestController
 public class UploadController {
-    final IUpload upload;
+    final IImage img;
 
-    public UploadController(IUpload upload) {
-        this.upload = upload;
+    public UploadController(IImage img) {
+        this.img = img;
     }
 
     @PostMapping("/upload/single")
-    public Result single(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "image", required = false) String image, UploadEnum type) {
-        return upload.upload(file == null ? image : file, type);
+    public Result single(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "image", required = false) String image, UploadEnum type, String value) {
+        return img.save(file == null ? image : file, type, value);
     }
 
     @PostMapping(value = "/upload/multiple")
-    public Result multiple(@RequestParam(value = "files", required = false) List<MultipartFile> files, @RequestParam(value = "images", required = false) List<String> images, UploadEnum type) {
-        return upload.uploadList(files == null || files.isEmpty() ? files : images, type);
+    public Result multiple(@RequestParam(value = "file", required = false) List<MultipartFile> file, UploadEnum type, String value) {
+        return img.saveList(file, type, value);
+    }
+
+    @PostMapping(value = "/upload/remove")
+    public Result remove(@RequestBody int id) {
+        img.remove(id);
+        return Result.SUCCESS;
+    }
+
+    @GetMapping(value = "/upload/list")
+    public Result list(Integer page, UploadEnum type, String value) {
+        return img.list(page, type, value);
     }
 }

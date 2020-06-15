@@ -2,6 +2,7 @@ package drama.painter.web.rbac.model.eb;
 
 import drama.painter.core.web.enums.StatusEnum;
 import drama.painter.core.web.enums.YesNoEnum;
+import drama.painter.web.rbac.model.com.Image;
 import lombok.Data;
 
 import java.util.List;
@@ -27,5 +28,5 @@ public class Product {
 
     List<ProductSku> sku;
     List<ProductSkuName> spu;
-    List<ProductImage> image;
+    List<Image> image;
 }

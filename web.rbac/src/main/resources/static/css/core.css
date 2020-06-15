@@ -7,27 +7,27 @@ html {
 .product-code {
     position: absolute;
     right: 15px;
-    top: 0px;
+    top: 0;
     line-height: 40px;
-    z-index: 2002;
+    z-index: 1999;
 }
 
-.upload-multiple {
-    text-align: center;
+.selected-image {
+    position: absolute;
+    left: 5px;
+    top: 5px;
+    color: #FF4500!important;
+    font-size: 20px;
+    outline: 1px solid #CCC;
+    background-color: white;
+    z-index: 2000;
 }
 
-.upload-multiple .helper {
-    display: inline-block;
-    height: 100%;
-    vertical-align: middle;
-}
-
-.upload-multiple img {
-    vertical-align: middle;
-    max-height: 146px;
-    max-width: 146px;
-    width: auto!important;
-    height: auto!important;
+.fullscreen-btn {
+    position: absolute;
+    right: 50px;
+    top: 22px;
+    z-index: 1999;
 }
 
 .tox-tinymce-aux {

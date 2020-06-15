@@ -1,4 +1,4 @@
-(function () {
+!function () {
     let modify = new Vue({
         el: '#modify',
         data: {
@@ -41,8 +41,7 @@
             dialogTitle: "",
             dialogEnabled: false,
             username_disabled: false,
-            colors: ["", "success", "warning", "danger", "info"],
-            enums: ENUM
+            colors: ["", "success", "warning", "danger", "info"]
         },
         methods: {
             loadRoles() {
@@ -127,7 +126,6 @@
             searchType: "",
             searchText: "",
             loading: false,
-            enums: ENUM,
             editQualify: false,
             removeQualify: false,
             passwordQualify: false
@@ -180,4 +178,4 @@
             }
         }
     });
-})();
+}();

@@ -2,7 +2,6 @@ package drama.painter.web.rbac.service.impl.eb;
 
 import drama.painter.core.web.enums.SearchEnum;
 import drama.painter.core.web.enums.StatusEnum;
-import drama.painter.core.web.ftp.upload.IUpload;
 import drama.painter.core.web.misc.Constant;
 import drama.painter.core.web.misc.Page;
 import drama.painter.core.web.misc.Result;
@@ -10,6 +9,7 @@ import drama.painter.core.web.utility.Caches;
 import drama.painter.core.web.utility.Randoms;
 import drama.painter.web.rbac.mapper.eb.ProductMapper;
 import drama.painter.web.rbac.model.eb.Product;
+import drama.painter.web.rbac.service.intf.com.IImage;
 import drama.painter.web.rbac.service.intf.eb.IProduct;
 import drama.painter.web.rbac.service.intf.eb.IProductSku;
 import drama.painter.web.rbac.tool.AssertEnum;
@@ -28,11 +28,11 @@ import static drama.painter.web.rbac.service.intf.other.ICache.PRODUCT_REFERENCE
 public class ProductImpl implements IProduct {
     final ProductMapper productMapper;
     final IProductSku sku;
-    final IUpload upload;
+    final IImage image;
 
-    public ProductImpl(ProductMapper productMapper, IUpload u, IProductSku sku) {
+    public ProductImpl(ProductMapper productMapper, IImage i, IProductSku sku) {
         this.productMapper = productMapper;
-        this.upload = u;
+        this.image = i;
         this.sku = sku;
     }
 
@@ -63,6 +63,11 @@ public class ProductImpl implements IProduct {
             productMapper.add(p);
         } else {
             productMapper.update(p);
+        }
+
+        if (!p.getImage().isEmpty()) {
+            p.getImage().forEach(o -> o.setValue(p.getId()));
+            image.update(p.getImage());
         }
         Caches.removeHash("Product", p.getCode());
     }

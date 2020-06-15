@@ -26,8 +26,8 @@ public class Upload implements IUpload {
     private static final Map<UploadEnum, Supplier<String>> FUNCTION = new HashMap();
 
     static {
-        FUNCTION.put(UploadEnum.HEAD, () -> getUrl(UploadEnum.HEAD.getName()));
-        FUNCTION.put(UploadEnum.PRODUCT, () -> getUrl(UploadEnum.PRODUCT.getName()));
+        FUNCTION.put(UploadEnum.STAFF_HEAD, () -> getUrl(UploadEnum.STAFF_HEAD.getName()));
+        FUNCTION.put(UploadEnum.PRODUCT_CAROUSEL, () -> getUrl(UploadEnum.PRODUCT_CAROUSEL.getName()));
     }
 
     public Upload(FtpConfig.FtpConfigProperties ftpConfig) {
@@ -35,7 +35,7 @@ public class Upload implements IUpload {
     }
 
     @Override
-    public Result upload(Object file, UploadEnum type) {
+    public Result<String> upload(Object file, UploadEnum type) {
         try {
             return new FileUploader(ftpConfig.isLocalized(), file, ftpConfig.getBasePath(), FUNCTION.get(type).get(), ftpConfig.getDomain()).call();
         } catch (Exception e) {
@@ -45,7 +45,7 @@ public class Upload implements IUpload {
     }
 
     @Override
-    public Result uploadList(List<?> files, UploadEnum type) {
+    public Result<List<String>> uploadList(List<?> files, UploadEnum type) {
         init();
 
         int size = files.size();
@@ -57,7 +57,7 @@ public class Upload implements IUpload {
                 list.add(task);
             }
 
-            Result r = Result.toSuccess("文件上传成功");
+            Result<List<String>> r = Result.toSuccess("文件上传成功");
             List<String> urls = new ArrayList(size);
             for (FutureTask<Result> o : list) {
                 Result temp = o.get();

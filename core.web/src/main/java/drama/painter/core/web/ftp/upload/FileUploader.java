@@ -28,7 +28,7 @@ class FileUploader implements Callable<Result> {
     }
 
     @Override
-    public Result call() throws IOException {
+    public Result<String> call() throws IOException {
         FtpEnum.UPLOAD_NOT_EXIST.doAssert(file == null);
         InputStream stream;
         if (file instanceof MultipartFile) {

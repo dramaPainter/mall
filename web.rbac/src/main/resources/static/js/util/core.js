@@ -30,8 +30,8 @@ ENUM.yesno = new Enum()
     .add('YES', '是', 1)
     .add('NO', '否', 0);
 ENUM.upload = new Enum()
-    .add('HEAD', '头像', 1)
-    .add('PRODUCT', '产品', 2);
+    .add('INDEX_CAROUSEL', '首页轮播图', 1)
+    .add('PRODUCT_CAROUSEL', '商品轮播图', 2);
 ENUM.menuType = new Enum()
     .add('MENU', '菜单', 2)
     .add('PAGE', '页面', 1)
@@ -107,11 +107,11 @@ function loadData(method, url, param, succeedCallback, failedCallback = function
 
 function loadTable(app, url, callback = function () {}) {
     loadData("get", url, {}, r => {
+        callback(r.data);
         app.tableData = r.data;
         app.rowCount = r.code;
         app.loading = false;
         delete r.data;
-        callback();
     }, e => {
         app.loading = false;
         app.$alert(e.message, '温馨提示');

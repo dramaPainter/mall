@@ -51,14 +51,14 @@
         <el-table-column label="已售" prop="sale"></el-table-column>
         <el-table-column label="状态" prop="status" min-width="50px">
             <template slot-scope="scope">
-                <label :class="scope.row.status == enums.status.ENABLE.value ? '' : 'red'">{{ enums.product.getName(scope.row.status) }}</label>
+                <label :class="scope.row.status == ENUM.status.ENABLE.value ? '' : 'red'">{{ ENUM.product.getName(scope.row.status) }}</label>
             </template>
         </el-table-column>
         <el-table-column label="热销" prop="hottest" min-width="50px">
-            <template slot-scope="scope">{{ enums.yesno.getName(scope.row.hottest) }}</template>
+            <template slot-scope="scope">{{ ENUM.yesno.getName(scope.row.hottest) }}</template>
         </el-table-column>
         <el-table-column label="新品" prop="latest" min-width="50px">
-            <template slot-scope="scope">{{ enums.yesno.getName(scope.row.latest) }}</template>
+            <template slot-scope="scope">{{ ENUM.yesno.getName(scope.row.latest) }}</template>
         </el-table-column>
         <el-table-column label="排序" prop="sort" min-width="50px"></el-table-column>
         <el-table-column label="关键词" prop="keyword" class-name="nowrap"></el-table-column>
@@ -68,8 +68,8 @@
                     <el-button @click="toEdit(scope.row)" icon="el-icon-edit" size="mini" v-if="editQualify"></el-button>
                     <el-button @click="toStock(scope.row)" icon="el-icon-odometer" size="mini" v-if="editQualify"></el-button>
                     <el-button @click="toDisplay(scope.row)" size="mini" v-if="displayQualify"
-                               :icon="scope.row.status == enums.status.ENABLE.value ? 'el-icon-bottom' : 'el-icon-top'"
-                               :title="scope.row.status == enums.status.ENABLE.value ? enums.product.DISABLE.name : enums.product.ENABLE.name">
+                               :icon="scope.row.status == ENUM.status.ENABLE.value ? 'el-icon-bottom' : 'el-icon-top'"
+                               :title="scope.row.status == ENUM.status.ENABLE.value ? ENUM.product.DISABLE.name : ENUM.product.ENABLE.name">
                     </el-button>
                 </el-button-group>
             </template>
@@ -80,7 +80,7 @@
 </div>
 <!-- 添加删除商品 -->
 <div id="upsert">
-    <el-dialog :title="dialogTitle" :visible.sync="dialogEnabled" width="640px">
+    <el-dialog :title="dialogTitle" :visible.sync="dialogEnabled" width="640px" top="50px" :show-close="false">
         <el-form :model="product" label-width="80px" ref="product" style="position: relative">
             <label class="product-code">{{product.code}}</label>
             <el-tabs type="border-card">
@@ -140,22 +140,20 @@
                         <el-input class="upload-avatar" v-if="newKeywordVisible" v-model.trim="newKeywordName" ref="keywordRef" size="small" @keyup.enter.native="saveKeyword" @blur="saveKeyword"></el-input>
                         <el-button size="small" v-if="!newKeywordVisible" @click="showKeywordInput">+ 关键字</el-button>
                     </el-form-item>
-                    <el-row>
-                        <el-form-item label="图片轮播">
-                            <el-upload action="/upload/multiple" :auto-upload="false" multiple="true" list-type="picture-card" :on-preview="uploadPreview" accept="image/**" :on-remove="uploadRemove" :file-list="product.image">
-                                <i slot="default" class="el-icon-plus"></i>
-                                <div slot="file" slot-scope="{file}" class="upload-multiple">
-                                    <span class="helper"></span>
-                                    <img class="el-upload-list__item-thumbnail" :src="file.url" alt="">
-                                    <span class="el-upload-list__item-actions">
-                                        <span v-if="!uploadVisible" class="el-upload-list__item-delete" @click="uploadAvatar(file)"><i class="el-icon-s-home" title="设为封面"></i></span>
-                                        <span class="el-upload-list__item-preview" @click="uploadPreview(file)"><i class="el-icon-zoom-in" title="查看原图"></i></span>
-                                        <span v-if="!uploadVisible" class="el-upload-list__item-delete" @click="uploadRemove(file)"><i class="el-icon-delete" title="删除图片"></i></span>
-                                    </span>
-                                </div>
-                            </el-upload>
-                        </el-form-item>
-                    </el-row>
+                    <el-form-item label="图片轮播">
+                        <ul class="el-upload-list el-upload-list--picture-card">
+                            <li class="el-upload-list__item" v-for="(file, index) in product.image">
+                                <i :class="(file.url == product.avatar ? 'el-icon-success' : '') + ' selected-image'"></i>
+                                <el-image :src="file.url" ref="reflect" :preview-src-list="[file.url]"></el-image>
+                                <span class="el-upload-list__item-actions">
+                                    <span class="el-upload-list__item-delete"><i title="设为封面" class="el-icon-s-home" @click="uploadAvatar(file)"></i></span>
+                                    <span class="el-upload-list__item-preview"><i title="查看原图" class="el-icon-zoom-in" @click="uploadPreview(index)"></i></span>
+                                    <span class="el-upload-list__item-delete"><i title="删除图片" class="el-icon-delete" @click="uploadRemove(file)"></i></span>
+                                </span>
+                            </li>
+                        </ul>
+                        <i slot="default" class="el-icon-plus" @click="show(product.code)"></i>
+                    </el-form-item>
                 </el-tab-pane>
                 <!-- 商品描述 -->
                 <el-tab-pane label="商品描述">
@@ -170,11 +168,10 @@
             <el-button @click="onSubmit('product')" type="primary">确 定</el-button>
         </span>
     </el-dialog>
-    <el-dialog :visible.sync="uploadVisible"><img width="100%" :src="uploadUrl" alt=""></el-dialog>
 </div>
 <!-- 价格库存 -->
 <div id="sku">
-    <el-dialog :title="dialogTitle" :visible.sync="dialogEnabled" @close="onCancel" width="800px">
+    <el-dialog :title="dialogTitle" :visible.sync="dialogEnabled" width="800px" top="50px" :show-close="false">
         <el-form :model="product" label-width="80px" ref="product">
             <el-tabs type="border-card">
                 <el-tab-pane label="商品属性" class="role_tag">
@@ -253,6 +250,39 @@
         <span class="dialog-footer" slot="footer">
             <el-button @click="onCancel">取 消</el-button>
             <el-button @click="onSubmit('product')" type="primary">确 定</el-button>
+        </span>
+    </el-dialog>
+</div>
+<!-- 图片库 -->
+<div id="library">
+    <el-dialog title="图片库" :visible.sync="dialogEnabled" width="680px" top="50px" :fullscreen="fullScreen">
+        <label :class="(fullScreen ? 'el-icon-arrow-down' : 'el-icon-full-screen') + ' fullscreen-btn pointer'"
+               @click="fullScreen = !fullScreen" :title="fullScreen ? '退出全屏' : '全屏'"></label>
+        <el-input class="input-with-select" placeholder="搜索ID" size="small" v-model="uploadData.value">
+            <el-select slot="prepend" v-model="uploadData.type" placeholder="搜索类型" clearable>
+                <el-option :key="item.value" :label="item.name" :value="item.value" v-for="item in ENUM.upload"></el-option>
+            </el-select>
+            <el-button @click="search" icon="el-icon-search" slot="append"></el-button>
+        </el-input>
+        <el-upload action="/upload/multiple" :auto-upload="true" multiple="true" list-type="picture-card" ref="upload"
+                   :data="uploadData" accept="image/*" :on-remove="uploadRemove" :file-list="tableData" :on-success="uploadSuccess">
+            <i slot="default" class="el-icon-plus"></i>
+            <div slot="file" slot-scope="{file}">
+                <i :class="(file.selected ? 'el-icon-success' : '') + ' selected-image'"></i>
+                <el-image :src="file.url" lazy ref="previewer" :preview-src-list="previewImages"></el-image>
+                <span class="el-upload-list__item-actions">
+                    <span :class="file.selected ? 'el-icon-success' : 'el-icon-circle-check'" @click="file.selected=!file.selected" title="勾选"></span>
+                    <span class="el-icon-zoom-in" @click="uploadPreview(file)" title="预览"></span>
+                    <span class="el-icon-delete" @click="uploadRemove(file)" title="删除"></span>
+                </span>
+            </div>
+        </el-upload>
+        <span>
+            <el-pagination :current-page="page" :page-size="size" :page-sizes="[15, 30, 45, 60, 100]" :total="rowCount" @size-change="sizeChanged" @current-change="pageChanged" class="pager" layout="sizes, total, prev, pager, next" slot="paging"></el-pagination>
+        </span>
+        <span class="dialog-footer" slot="footer">
+            <el-button @click="onCancel">取 消</el-button>
+            <el-button @click="onConfirm" type="primary">确 定</el-button>
         </span>
     </el-dialog>
 </div>

@@ -36,7 +36,7 @@ public interface ProductMapper {
             @Result(property = "id", column = "id"),
             @Result(property = "sku", column = "id", many = @Many(select = "drama.painter.web.rbac.mapper.eb.ProductSkuMapper.list")),
             @Result(property = "spu", column = "id", many = @Many(select = "drama.painter.web.rbac.mapper.eb.ProductSkuNameMapper.list")),
-            @Result(property = "image", column = "id", many = @Many(select = "drama.painter.web.rbac.mapper.eb.ProductImageMapper.list"))
+            @Result(property = "image", column = "id", many = @Many(select = "drama.painter.web.rbac.mapper.com.ImageMapper.listProduct"))
     })
     @Select("SELECT id,name,code,category,brand,sort,status,hottest,latest,sale,keyword,avatar,body FROM eb_product WHERE code = #{code}")
     Product get(String code);
@@ -59,7 +59,7 @@ public interface ProductMapper {
     @Update({"UPDATE eb_product SET ",
             "name = #{name}, category = #{category}, brand = #{brand}, ",
             "sort = #{sort}, hottest = #{hottest}, latest = #{latest}, ",
-            "sale = #{sale}, keyword = #{keyword}, avatar = #{icon}, body = #{body} ",
+            "sale = #{sale}, keyword = #{keyword}, avatar = #{avatar}, body = #{body} ",
             "WHERE id = #{id}"})
     void update(Product p);
 

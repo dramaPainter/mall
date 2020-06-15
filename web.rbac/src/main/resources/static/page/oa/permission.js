@@ -1,12 +1,11 @@
-(function () {
+!function () {
     let upsert = new Vue({
         el: '#upsert',
         data: {
             permission: {},
             dialogTitle: "",
             dialogEnabled: false,
-            id_disabled: false,
-            enums: ENUM
+            id_disabled: false
         },
         methods: {
             toEdit(row) {
@@ -68,7 +67,6 @@
             searchType: "",
             searchText: "",
             loading: false,
-            enums: ENUM,
             editQualify: false,
             removeQualify: false
         },
@@ -106,4 +104,4 @@
             }
         }
     });
-})();
+}();
