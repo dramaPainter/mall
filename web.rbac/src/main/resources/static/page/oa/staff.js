@@ -131,18 +131,9 @@
             passwordQualify: false
         },
         mounted: function () {
-            upsert.loadRoles().then(() => {
-                loadData("get", "/dir/qualify?url=/oa/staff/save", {}, r => {
-                    this.editQualify = r.data == true;
-                }, null);
-                loadData("get", "/dir/qualify?url=/oa/staff/remove", {}, r => {
-                    this.removeQualify = r.data == true;
-                }, null);
-                loadData("get", "/dir/qualify?url=/oa/staff/password", {}, r => {
-                    this.passwordQualify = r.data == true;
-                }, null);
-            });
-
+            loadPermission(this, "editQualify", "/dir/qualify?url=/oa/staff/save");
+            loadPermission(this, "removeQualify", "/dir/qualify?url=/oa/staff/remove");
+            loadPermission(this, "passwordQualify", "/dir/qualify?url=/oa/staff/password");
             this.search();
         },
         methods: {

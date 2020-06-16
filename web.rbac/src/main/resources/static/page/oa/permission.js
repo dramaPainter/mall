@@ -71,13 +71,8 @@
             removeQualify: false
         },
         mounted: function () {
-            loadData("get", "/dir/qualify?url=/oa/permission/save", {}, r => {
-                this.editQualify = r.data == true;
-            }, null);
-            loadData("get", "/dir/qualify?url=/oa/permission/remove", {}, r => {
-                this.removeQualify = r.data == true;
-            }, null);
-
+            loadPermission(this, "editQualify", "/dir/qualify?url=/oa/permission/save");
+            loadPermission(this, "removeQualify", "/dir/qualify?url=/oa/permission/remove");
             this.search();
         },
         methods: {

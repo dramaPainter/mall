@@ -105,6 +105,25 @@ function loadData(method, url, param, succeedCallback, failedCallback = function
     }).catch(r => failedCallback({code: -1, message: r}));
 }
 
+function loadOption(app, url, field) {
+    return new Promise(load => {
+        loadData("get", url, {}, r => {
+            if (r.code >= 0) {
+                load(r.data);
+                app[field] = r.data;
+            } else {
+                app.$message.error(r.message);
+            }
+        }, e => {
+            app.$alert(e.message, '温馨提示');
+        });
+    });
+}
+
+function loadPermission(app, field, url) {
+    loadData("get", url, {}, r => {app[field] = r.data == true}, null);
+}
+
 function loadTable(app, url, callback = function () {}) {
     loadData("get", url, {}, r => {
         callback(r.data);

@@ -201,37 +201,11 @@ let upsert = new Vue({
         newKeywordVisible: false,
         newKeywordName: ""
     },
+    mounted: function () {
+        loadOption(this, "/eb/category?page=1&pageSize=9999", "categories").then(x => x.forEach(o => o.id = o.id + ""));
+        loadOption(this, "/eb/brand?page=1&pageSize=9999", "brands").then(x => x.forEach(o => o.id = o.id + ""));
+    },
     methods: {
-        loadCategories() {
-            return new Promise(load => {
-                loadData("get", "/eb/category?page=1&pageSize=9999", {}, r => {
-                    if (r.code >= 0) {
-                        r.data.forEach(o => o.id = o.id + "");
-                        this.categories = r.data;
-                        load();
-                    } else {
-                        this.$message.error(r.message);
-                    }
-                }, e => {
-                    this.$alert(e.message, '温馨提示');
-                });
-            });
-        },
-        loadBrands() {
-            return new Promise(load => {
-                loadData("get", "/eb/brand?page=1&pageSize=9999", {}, r => {
-                    if (r.code >= 0) {
-                        r.data.forEach(o => o.id = o.id + "");
-                        this.brands = r.data;
-                        load();
-                    } else {
-                        this.$message.error(r.message);
-                    }
-                }, e => {
-                    this.$alert(e.message, '温馨提示');
-                });
-            });
-        },
         toEdit(row) {
             this.dialogTitle = "修改商品";
             this.dialogEnabled = true;
@@ -338,20 +312,11 @@ let app = new Vue({
         searchText: "",
         loading: false,
         displayQualify: false,
-        editQualify: false,
-        sort: 0,
-        sale: 0
+        editQualify: false
     },
     mounted: function () {
-        loadData("get", "/dir/qualify?url=/eb/product/save", {}, r => {
-            this.editQualify = r.data == true;
-        }, null);
-        loadData("get", "/dir/qualify?url=/eb/product/display", {}, r => {
-            this.displayQualify = r.data == true;
-        }, null);
-        upsert.loadCategories();
-        upsert.loadBrands();
-
+        loadPermission(this, "editQualify", "/dir/qualify?url=/eb/product/save");
+        loadPermission(this, "editQualify", "/dir/qualify?url=/eb/product/display");
         this.search();
     },
     methods: {

@@ -104,14 +104,9 @@
         },
         mounted: function () {
             upsert.loadPermission().then(() => {
-                loadData("get", "/dir/qualify?url=/oa/role/save", {}, r => {
-                    this.editQualify = r.data == true;
-                }, null);
-                loadData("get", "/dir/qualify?url=/oa/role/remove", {}, r => {
-                    this.removeQualify = r.data == true;
-                }, null);
+                loadPermission(this, "editQualify", "/dir/qualify?url=/oa/role/save");
+                loadPermission(this, "removeQualify", "/dir/qualify?url=/oa/role/remove");
             });
-
             this.search();
         },
         methods: {
